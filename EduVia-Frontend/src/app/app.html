@@ -1,0 +1,7 @@
+<div class="app-container">
+  @if (!isLoggedIn()) {
+    <app-login [role]="'student'" (login)="onLogin($event)" />
+  } @else {
+    <app-student-dashboard (logout)="onLogout()" />
+  }
+</div>

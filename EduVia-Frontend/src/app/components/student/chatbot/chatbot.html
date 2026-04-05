@@ -1,0 +1,52 @@
+<div class="ai-chat">
+  <div class="ai-chat__intro">
+    <div class="ai-chat__title-row">
+      <div class="ai-chat__title-icon">
+        <span>💬</span>
+      </div>
+      <div>
+        <h2>Assistant d'apprentissage IA</h2>
+        <p>Posez vos questions et obtenez de l'aide personnalisee 24/7</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="ai-chat__panel">
+    <div class="ai-chat__messages">
+      <article
+        *ngFor="let message of messages"
+        class="ai-message"
+        [class.ai-message--student]="message.sender === 'student'"
+      >
+        <div class="ai-message__avatar">
+          <span *ngIf="message.sender === 'assistant'">🤖</span>
+          <span *ngIf="message.sender === 'student'">👤</span>
+        </div>
+
+        <div class="ai-message__bubble">
+          <p>{{ message.text }}</p>
+          <span>{{ message.time }}</span>
+        </div>
+      </article>
+    </div>
+
+    <div class="ai-chat__quick">
+      <button type="button" *ngFor="let reply of quickReplies" (click)="useQuickReply(reply)">
+        {{ reply }}
+      </button>
+    </div>
+
+    <div class="ai-chat__composer">
+      <input
+        type="text"
+        [(ngModel)]="draftMessage"
+        (keydown.enter)="sendMessage()"
+        [disabled]="sending"
+        placeholder="Posez votre question..."
+      />
+      <button type="button" (click)="sendMessage()" [disabled]="sending">
+        {{ sending ? '…' : '➤' }}
+      </button>
+    </div>
+  </div>
+</div>

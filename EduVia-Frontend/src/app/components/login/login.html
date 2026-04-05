@@ -1,0 +1,43 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="logo-wrapper">
+      <img src="logo.png" alt="EduVia logo" class="login-logo" />
+    </div>
+    <h2>Bienvenue sur EduVia</h2>
+    <p>Connectez-vous pour acceder a votre espace etudiant</p>
+
+    <form (ngSubmit)="onSubmit()">
+      <div class="field">
+        <label for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          [(ngModel)]="email"
+          name="email"
+          required
+          autocomplete="username"
+        />
+      </div>
+
+      <div class="field">
+        <label for="password">Mot de passe</label>
+        <input
+          id="password"
+          type="password"
+          [(ngModel)]="password"
+          name="password"
+          required
+          autocomplete="current-password"
+        />
+      </div>
+
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+
+      <button mat-flat-button color="primary" class="submit-btn" type="submit">
+        Se connecter en tant qu'etudiant
+      </button>
+    </form>
+  </div>
+</div>
