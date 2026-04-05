@@ -1,0 +1,351 @@
+.dashboard-container {
+  min-height: 100vh;
+  background-color: #f8fafc;
+  padding: 1.25rem;
+  font-family: 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.6rem;
+  padding-bottom: 0.45rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.notification-button {
+  border-radius: 999px;
+}
+
+
+.dashboard-drawer-container {
+  height: 100%;
+}
+
+mat-drawer {
+  width: 360px;
+  max-width: 90vw;
+  background: #ffffff;
+  box-shadow: -4px 0 12px rgba(0,0,0,0.15);
+  padding: 1rem;
+  position: relative;
+}
+
+.drawer-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+}
+
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.header-topline {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logo-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.18rem;
+}
+
+.brand-copy h1 {
+  margin: 0;
+  color: #111827;
+  font-size: 1.85rem;
+  line-height: 1.1;
+}
+
+.brand-copy p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.95rem;
+  line-height: 1.3;
+}
+
+.user-avatar-block {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+}
+
+.user-avatar-image,
+.user-avatar-fallback {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
+
+.user-avatar-image {
+  object-fit: cover;
+  border: 2px solid #e7e9f1;
+}
+
+.user-avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f6dfe4;
+  color: #c8183c;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.dashboard-logo {
+  width: 80px;
+  height: auto;
+  display: block;
+}
+
+.prof-name {
+  font-size: 1.05rem;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.header-userline {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.logout-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  min-height: 2.5rem;
+  padding: 0.6rem 0.95rem;
+  border: 1px solid #f2c6ce;
+  border-radius: 0.9rem;
+  background: #fff5f7;
+  color: #c0395a;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease, background-color 160ms ease, color 160ms ease;
+}
+
+.logout-btn:hover {
+  border-color: #e3909f;
+  background: #fff0f3;
+  box-shadow: 0 14px 28px rgba(192, 57, 90, 0.12);
+  transform: translateY(-1px);
+}
+
+.logout-btn mat-icon {
+  width: 1rem;
+  height: 1rem;
+  font-size: 1rem;
+}
+
+.custom-tab-group {
+  ::ng-deep .mat-mdc-tab-header {
+    margin-bottom: 1.5rem;
+  }
+
+  ::ng-deep .mat-mdc-tab-labels {
+    background-color: #f1f5f9;
+    border-radius: 9999px;
+    padding: 0.375rem;
+    width: fit-content;
+  }
+
+  ::ng-deep .mat-mdc-tab-label {
+    padding: 0.625rem 1.25rem;
+    border-radius: 9999px;
+    font-weight: 500;
+    color: #4b5563;
+  }
+
+  ::ng-deep .mat-mdc-tab-label.mat-mdc-tab-active {
+    background-color: white;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    color: #111827;
+  }
+}
+
+.overview-content {
+  padding: 0 0.5rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 3rem;
+}
+
+.stat-card {
+  background: white;
+  padding: 1.75rem 1.25rem;
+  border-radius: 1rem;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+  border: 1px solid #f3f4f6;
+}
+
+.stat-icon {
+  font-size: 2.8rem;
+  height: 2.8rem;
+  width: 2.8rem;
+  margin-bottom: 1rem;
+}
+
+.blue   { color: #3b82f6; }
+.orange { color: #f97316; }
+.green  { color: #10b981; }
+.yellow { color: #eab308; }
+
+.stat-number {
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.stat-title {
+  font-size: 0.95rem;
+  color: #6b7280;
+}
+
+.courses-section {
+  margin-top: 2.5rem;
+}
+
+.courses-section h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 1.25rem 0;
+}
+
+.courses-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.course-item {
+  display: flex;
+  justify-content: space-between !important;
+  align-items: flex-start;
+  padding: 1.5rem 1.75rem;
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+  background: white;
+  gap: 2rem;
+  flex-wrap: nowrap;
+}
+
+.course-left {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  min-width: 0;
+}
+
+.course-left h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 0.4rem 0;
+}
+
+.course-subtitle {
+  font-size: 1rem;
+  color: #6b7280;
+  margin: 0 0 0.5rem 0;
+}
+
+.course-students {
+  font-size: 1rem;
+  color: #4b5563;
+  font-weight: 500;
+  margin: 0;
+}
+
+.voir-details {
+  flex: 0 0 auto;
+  min-width: 160px;
+  padding: 0.6rem 1.4rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  border-color: #c026d3;
+  color: #c026d3;
+  border-radius: 9999px;
+  white-space: nowrap;
+  align-self: flex-start;
+  margin-left: auto;
+}
+
+.voir-details:hover {
+  background-color: #c026d3;
+  color: white;
+  border-color: #c026d3;
+}
+
+.dashboard-footer {
+  margin-top: 5rem;
+  text-align: center;
+  color: #9ca3af;
+  font-size: 0.875rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .course-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.25rem;
+  }
+
+  .voir-details {
+    width: 100%;
+    text-align: center;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+ /* Profile Button */
+.profile-btn {
+  background: white;
+  border: 1px solid #ddd;
+  padding: 8px 15px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: 0.3s;
+}
+
+.profile-btn:hover {
+  background-color: #f5f5f5;
+}
+}

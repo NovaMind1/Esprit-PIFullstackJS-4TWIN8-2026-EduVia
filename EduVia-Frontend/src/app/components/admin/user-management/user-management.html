@@ -1,0 +1,276 @@
+<section class="users-page">
+  <article class="users-hero">
+    <div class="users-hero__copy">
+      <div class="hero-icon">
+        <mat-icon>group</mat-icon>
+      </div>
+      <div>
+        <h2>Gestion des Utilisateurs</h2>
+        <p>
+          Gerez les roles des utilisateurs : Enseignants et Etudiants.
+          Ajoutez, modifiez ou supprimez des comptes utilisateurs.
+        </p>
+      </div>
+    </div>
+
+    <button type="button" class="primary-action" (click)="openAddUserDialog()">
+      <mat-icon>add</mat-icon>
+      <span>Nouvel utilisateur</span>
+    </button>
+  </article>
+
+  <div class="summary-grid summary-grid--three">
+    <article class="summary-card">
+      <div class="summary-head">
+        <mat-icon>group</mat-icon>
+        <span>Total</span>
+      </div>
+      <strong>{{ userCounts.all }}</strong>
+    </article>
+
+    <article class="summary-card">
+      <div class="summary-head summary-head--teacher">
+        <mat-icon>person_search</mat-icon>
+        <span>Enseignants</span>
+      </div>
+      <strong>{{ userCounts.teacher }}</strong>
+    </article>
+
+    <article class="summary-card">
+      <div class="summary-head summary-head--student">
+        <mat-icon>school</mat-icon>
+        <span>Etudiants</span>
+      </div>
+      <strong>{{ userCounts.student }}</strong>
+    </article>
+  </div>
+
+  <div class="filters-row">
+    <label class="search-field">
+      <mat-icon>search</mat-icon>
+      <input
+        type="text"
+        placeholder="Rechercher par nom ou email..."
+        [(ngModel)]="rawSearchQuery"
+        (input)="onSearchInput(rawSearchQuery)" />
+    </label>
+
+    <div class="menu-shell">
+      <button type="button" class="filter-button" (click)="toggleFilterMenu()">
+        <span>{{ selectedRoleLabel }}</span>
+        <mat-icon [class.rotated]="isFilterMenuOpen">expand_more</mat-icon>
+      </button>
+
+      <div *ngIf="isFilterMenuOpen" class="menu-panel">
+        <button type="button" class="menu-option" (click)="selectFilterRole('all')">Tous les roles</button>
+        <button type="button" class="menu-option" (click)="selectFilterRole('teacher')">Enseignants</button>
+        <button type="button" class="menu-option" (click)="selectFilterRole('student')">Etudiants</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="users-list" *ngIf="filteredUsers.length > 0; else emptyState">
+    <article *ngFor="let user of filteredUsers; trackBy: trackByUserId" class="user-card">
+      <div class="user-main">
+        <div [class]="getRolePanelClass(user.role)">
+          <mat-icon>{{ getRoleIcon(user.role) }}</mat-icon>
+        </div>
+
+        <div class="user-copy">
+          <div class="user-title-row">
+            <h3>{{ user.name }}</h3>
+          </div>
+
+          <div class="user-status-row">
+            <span [class]="getRoleChipClass(user.role)">{{ getRoleLabel(user.role) }}</span>
+            <span [class]="getVerificationClass(user.isVerified)">
+              {{ getVerificationLabel(user.isVerified) }}
+            </span>
+            <span *ngIf="user.isVerified" [class]="getAccountStatusClass(user.accountStatus)">
+              {{ getAccountStatusLabel(user.accountStatus) }}
+            </span>
+          </div>
+
+          <p class="user-email">{{ user.email }}</p>
+
+          <div class="user-meta">
+            <span>Inscrit le {{ user.createdAt | date:'dd MMM yyyy' }}</span>
+            <ng-container *ngIf="user.isVerified">
+              <span class="dot">•</span>
+              <span>Derniere activite : {{ getLastActivityLabel(user) }}</span>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+
+      <div class="user-actions">
+        <button type="button" class="secondary-action" (click)="openEditUserDialog(user)">
+          <mat-icon>edit_square</mat-icon>
+          <span>Modifier</span>
+        </button>
+
+        <button type="button" class="secondary-action secondary-action--danger" (click)="openDeleteModal(user)">
+          <mat-icon>delete</mat-icon>
+          <span>Supprimer</span>
+        </button>
+      </div>
+    </article>
+  </div>
+
+  <ng-template #emptyState>
+    <article class="empty-card">
+      <p>Aucun utilisateur trouve</p>
+    </article>
+  </ng-template>
+
+  <div *ngIf="showAddUserModal" class="modal-backdrop" (click)="closeAddUserDialog()">
+    <section class="modal-panel" (click)="$event.stopPropagation()">
+      <button type="button" class="close-button" (click)="closeAddUserDialog()">
+        <mat-icon>close</mat-icon>
+      </button>
+
+      <h3>Ajouter un nouvel utilisateur</h3>
+
+      <div class="form-field">
+        <label for="new-user-name">Nom complet</label>
+        <input
+          id="new-user-name"
+          type="text"
+          placeholder="Ex: Jean Dupont"
+          [(ngModel)]="newUser.name" />
+      </div>
+
+      <div class="form-field">
+        <label for="new-user-email">Email</label>
+        <input
+          id="new-user-email"
+          type="email"
+          placeholder="jean.dupont@university.fr"
+          [(ngModel)]="newUser.email" />
+      </div>
+
+      <div class="form-field">
+        <label>Role</label>
+        <div class="menu-shell">
+          <button type="button" class="filter-button filter-button--field" (click)="toggleAddRoleMenu()">
+            <span>{{ addRoleLabel }}</span>
+            <mat-icon [class.rotated]="isAddRoleMenuOpen">expand_more</mat-icon>
+          </button>
+
+          <div *ngIf="isAddRoleMenuOpen" class="menu-panel menu-panel--full">
+            <button type="button" class="menu-option" (click)="selectAddRole('teacher')">Enseignant</button>
+            <button type="button" class="menu-option" (click)="selectAddRole('student')">Etudiant</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <small>Un mot de passe temporaire sera genere automatiquement et envoye par email.</small>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="ghost-action" (click)="closeAddUserDialog()">Annuler</button>
+        <button
+          type="button"
+          class="primary-action"
+          [disabled]="isCreatingUser || !isCreateUserFormValid"
+          (click)="createUser()">
+          Creer l'utilisateur
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <div *ngIf="showEditUserModal" class="modal-backdrop" (click)="closeEditUserDialog()">
+    <section class="modal-panel" (click)="$event.stopPropagation()">
+      <button type="button" class="close-button" (click)="closeEditUserDialog()">
+        <mat-icon>close</mat-icon>
+      </button>
+
+      <h3>Modifier l'utilisateur</h3>
+
+      <div class="form-field">
+        <label for="edit-user-name">Nom complet</label>
+        <input
+          id="edit-user-name"
+          type="text"
+          [(ngModel)]="editUser.name" />
+      </div>
+
+      <div class="form-field">
+        <label for="edit-user-email">Email</label>
+        <input
+          id="edit-user-email"
+          type="email"
+          [(ngModel)]="editUser.email" />
+      </div>
+
+      <div class="form-field">
+        <label>Role</label>
+        <div class="menu-shell">
+          <button type="button" class="filter-button filter-button--field" (click)="toggleEditRoleMenu()">
+            <span>{{ editRoleLabel }}</span>
+            <mat-icon [class.rotated]="isEditRoleMenuOpen">expand_more</mat-icon>
+          </button>
+
+          <div *ngIf="isEditRoleMenuOpen" class="menu-panel menu-panel--full">
+            <button type="button" class="menu-option" (click)="selectEditRole('teacher')">Enseignant</button>
+            <button type="button" class="menu-option" (click)="selectEditRole('student')">Etudiant</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="ghost-action" (click)="closeEditUserDialog()">Annuler</button>
+        <button type="button" class="primary-action" (click)="saveUserChanges()">Enregistrer</button>
+      </div>
+    </section>
+  </div>
+
+  <div *ngIf="showDeleteModal" class="modal-backdrop" (click)="closeDeleteModal()">
+    <section class="modal-panel modal-panel--compact" (click)="$event.stopPropagation()">
+      <button type="button" class="close-button" (click)="closeDeleteModal()">
+        <mat-icon>close</mat-icon>
+      </button>
+
+      <div class="confirm-head">
+        <div class="confirm-icon">
+          <mat-icon>delete_forever</mat-icon>
+        </div>
+        <div>
+          <h3>Supprimer cet utilisateur</h3>
+          <p *ngIf="pendingDeleteUser">
+            Voulez-vous vraiment supprimer {{ pendingDeleteUser.name }} ?
+          </p>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="ghost-action" (click)="closeDeleteModal()">Annuler</button>
+        <button type="button" class="danger-action" (click)="confirmDeleteUser()">Supprimer</button>
+      </div>
+    </section>
+  </div>
+
+  <div *ngIf="showSuccessModal" class="modal-backdrop" (click)="closeSuccessModal()">
+    <section class="modal-panel modal-panel--compact modal-panel--success" (click)="$event.stopPropagation()">
+      <button type="button" class="close-button" (click)="closeSuccessModal()">
+        <mat-icon>close</mat-icon>
+      </button>
+
+      <div class="confirm-head">
+        <div class="confirm-icon confirm-icon--success">
+          <mat-icon>check_circle</mat-icon>
+        </div>
+        <div>
+          <h3>Operation reussie</h3>
+          <p>{{ successMessage }}</p>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="primary-action" (click)="closeSuccessModal()">Fermer</button>
+      </div>
+    </section>
+  </div>
+</section>
