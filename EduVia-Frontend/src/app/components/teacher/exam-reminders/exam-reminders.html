@@ -1,0 +1,152 @@
+<p>exam-reminders works!</p>
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header-card">
+    <div class="header-content">
+      <i class="fa-solid fa-bell"></i>
+      <div>
+        <h2>Envoi de Rappels avant les Examens</h2>
+        <p>
+          Envoyez des rappels ciblés aux étudiants avant les examens.
+          Le système identifie automatiquement les étudiants n'ayant pas complété certains chapitres.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION -->
+  <h3 class="section-title">Examens à venir</h3>
+
+  <!-- EXAM CARD -->
+  <div class="exam-card">
+
+    <div class="exam-left">
+      <i class="fa-solid fa-calendar"></i>
+
+      <div>
+        <h4>Structures de données</h4>
+        <p>10 Février 2026 • 14h00 - 16h00</p>
+
+        <div class="meta">
+          📍 Lieu : Amphithéâtre A
+        </div>
+
+        <div class="chapters">
+          Chapitres :
+          <span>Chapitre 1</span>
+          <span>Chapitre 2</span>
+          <span>Chapitre 3</span>
+          <span>Chapitre 4</span>
+        </div>
+
+        <div class="students">
+          👥 45 étudiants inscrits
+        </div>
+
+        <div class="alert-warning">
+          ⚠ 4 étudiant(s) n'ont pas terminé tous les chapitres
+        </div>
+
+      </div>
+    </div>
+
+    <button class="btn-primary" (click)="openModal()">
+      <i class="fa-solid fa-paper-plane"></i>
+      Envoyer un rappel
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- ================= MODAL ================= -->
+
+<div class="modal-overlay" *ngIf="showModal">
+  <div class="modal">
+
+    <div class="modal-header">
+      <h3>Envoyer un rappel d'examen</h3>
+      <i class="fa-solid fa-xmark close" (click)="closeModal()"></i>
+    </div>
+
+    <!-- Exam Info -->
+    <div class="exam-info">
+      <i class="fa-solid fa-calendar"></i>
+      <div>
+        <strong>Structures de données</strong> - 10 Février 2026
+        <p>45 étudiants inscrits</p>
+      </div>
+    </div>
+
+    <!-- Student list -->
+    <div class="students-section">
+      <div class="section-header">
+        <h4>Étudiants n'ayant pas complété tous les chapitres</h4>
+        <button class="btn-outline small">Tout sélectionner</button>
+      </div>
+
+      <div class="student-item">
+        <input type="checkbox">
+        <div>
+          <strong>Thomas Martin</strong>
+          <p>Progression : 45% • Manquants : Chapitre 3, Chapitre 4</p>
+        </div>
+      </div>
+
+      <div class="student-item">
+        <input type="checkbox">
+        <div>
+          <strong>Lucas Bernard</strong>
+          <p>Progression : 28% • Manquants : Chapitre 2, 3, 4</p>
+        </div>
+      </div>
+
+      <div class="student-item">
+        <input type="checkbox">
+        <div>
+          <strong>Julie Petit</strong>
+          <p>Progression : 55% • Manquants : Chapitre 4</p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="checkbox-all">
+      <input type="checkbox" checked>
+      Envoyer à tous les étudiants (45)
+    </div>
+
+    <!-- Message -->
+    <h4>Message du rappel</h4>
+
+    <textarea class="message-box">
+Rappel : Examen de Structures de données le 10 Février 2026
+
+L'examen portera sur les chapitres suivants :
+Chapitre 1, Chapitre 2, Chapitre 3, Chapitre 4
+
+Certains d'entre vous n'ont pas encore complété tous les chapitres.
+Merci de les terminer pour améliorer vos chances de réussite.
+
+Bon courage dans vos révisions !
+    </textarea>
+
+    <div class="preview">
+      <h5>Aperçu du message :</h5>
+      <div class="preview-box">
+        (Aperçu identique au message)
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="closeModal()">Annuler</button>
+      <button class="btn-primary">
+        <i class="fa-solid fa-paper-plane"></i>
+        Envoyer le rappel
+      </button>
+    </div>
+
+  </div>
+</div>

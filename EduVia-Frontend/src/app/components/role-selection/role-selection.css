@@ -1,0 +1,146 @@
+.role-selection-container {
+  min-height: 100vh;
+  background: #f8fafc;           /* fond très clair comme sur la capture */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  font-family: 'Roboto', 'Helvetica Neue', sans-serif; /* ou Inter si tu l'as */
+}
+
+.main-content {
+  width: 100%;
+  max-width: 1100px;
+  text-align: center;
+}
+
+.header {
+  margin-bottom: 3.5rem;
+}
+
+.logo-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  height: 160px;
+}
+
+.logo-img {
+  max-width: 160px;
+  max-height: 160px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.slogan {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: #4f46e5;               /* indigo */
+  margin-bottom: 0.5rem;
+}
+
+.title {
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0.25rem 0 2.5rem;
+}
+
+.subtitle {
+  font-size: 1.25rem;
+  color: #4b5563;
+  margin: 0;
+}
+
+.roles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+  justify-items: center;
+}
+
+.role-card {
+  background: white;
+  border-radius: 1.25rem;
+  padding: 2.5rem 1.75rem;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.role-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 35px -10px rgba(0,0,0,0.12);
+}
+
+.icon-circle {
+  width: 5.5rem;
+  height: 5.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+}
+
+.icon-circle .role-icon {
+  font-size: 2.8rem;
+  height: 2.8rem;
+  width: 2.8rem;
+  color: white;
+}
+
+.student-circle { background: #fee2e2; }     /* rose clair/rouge clair */
+
+.student-btn {
+  background-color: #dc2626 !important;     /* rouge vif */
+  color: white !important;
+  border-radius: 9999px !important;
+  padding: 0.75rem 2.5rem !important;
+  font-weight: 600;
+  text-transform: none;
+  min-width: 180px;
+}
+
+.teacher-circle { background: #dcfce7; }     /* vert clair */
+
+.teacher-btn {
+  background-color: #0f172a !important;     /* noir foncé / presque noir */
+  color: white !important;
+  border-radius: 9999px !important;
+  padding: 0.75rem 2.5rem !important;
+  font-weight: 600;
+  text-transform: none;
+  min-width: 180px;
+}
+
+.admin-circle { background: #f3e8ff; }       /* violet clair */
+
+.admin-btn {
+  background-color: #581c87 !important;     /* violet foncé */
+  color: white !important;
+  border-radius: 9999px !important;
+  padding: 0.75rem 2.5rem !important;
+  font-weight: 600;
+  text-transform: none;
+  min-width: 180px;
+}
+
+.role-card h3 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.role-card p {
+  font-size: 1rem;
+  color: #4b5563;
+  line-height: 1.5;
+  margin-bottom: 2rem;
+}
