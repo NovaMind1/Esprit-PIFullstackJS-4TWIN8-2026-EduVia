@@ -21,7 +21,11 @@
             "tsConfig": "tsconfig.app.json",
             "assets": [
               {
+<<<<<<< HEAD
                 "glob": "**/*",
+=======
+                "glob": "*/",
+>>>>>>> souhail
                 "input": "public"
               }
             ],
@@ -40,8 +44,13 @@
                 },
                 {
                   "type": "anyComponentStyle",
+<<<<<<< HEAD
                   "maximumWarning": "4kB",
                   "maximumError": "8kB"
+=======
+                  "maximumWarning": "14kB",
+                  "maximumError": "18kB"
+>>>>>>> souhail
                 }
               ],
               "outputHashing": "all"

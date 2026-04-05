@@ -1,1 +1,157 @@
+<<<<<<< HEAD
 <p>student-forum works!</p>
+=======
+<section class="forum-shell">
+  <div class="forum-hero">
+    <div class="forum-hero__icon">👥</div>
+    <div>
+      <h2>Entraide Étudiante - Forum & Chat</h2>
+      <p>
+        Posez vos questions et recevez de l'aide de vos camarades. Lorsqu'un étudiant répond, un
+        chat privé s'ouvre automatiquement pour faciliter l'échange.
+      </p>
+    </div>
+  </div>
+
+  <div class="forum-toolbar">
+    <div class="forum-search">
+      <span>🔎</span>
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        placeholder="Rechercher une question..."
+      />
+    </div>
+
+    <button type="button" class="forum-help-button" (click)="openHelpModal()">
+      <span>💬</span>
+      Demander de l'aide
+    </button>
+  </div>
+
+  <div class="forum-stats">
+    <article class="forum-stat">
+      <strong>{{ openQuestionsCount }}</strong>
+      <span>Questions ouvertes</span>
+    </article>
+
+    <article class="forum-stat">
+      <strong>{{ repliesTodayCount }}</strong>
+      <span>Réponses aujourd'hui</span>
+    </article>
+
+    <article class="forum-stat">
+      <strong>{{ resolutionRate }}%</strong>
+      <span>Taux de résolution</span>
+    </article>
+  </div>
+
+  <section class="forum-section">
+    <h3>Demandes d'aide récentes</h3>
+
+    <article *ngFor="let request of filteredRequests" class="forum-request">
+      <div class="forum-request__header">
+        <div class="forum-request__avatar">👤</div>
+        <div>
+          <h4>{{ request.author }}</h4>
+          <p>{{ request.level }}</p>
+        </div>
+      </div>
+
+      <h5>{{ request.title }}</h5>
+      <p class="forum-request__message">{{ request.message }}</p>
+
+      <div class="forum-request__meta">
+        <span>🕒 {{ request.time }}</span>
+        <span>💭 {{ request.replies }} réponses</span>
+        <span
+          class="forum-status"
+          [class.forum-status--pending]="request.status === 'En attente'"
+          [class.forum-status--active]="request.status === 'En discussion'"
+          [class.forum-status--resolved]="request.status === 'Resolue'"
+        >
+          {{ request.status }}
+        </span>
+      </div>
+
+      <button type="button" class="forum-request__action" (click)="openChat(request)">
+        ✈️ Répondre et ouvrir le chat
+      </button>
+    </article>
+  </section>
+</section>
+
+<div class="forum-modal-backdrop" *ngIf="openedChatRequest as request" (click)="closeChat()">
+  <div class="forum-modal" (click)="$event.stopPropagation()">
+    <div class="forum-modal__header">
+      <div>
+        <h3>Chat avec {{ request.author }}</h3>
+        <p>{{ request.level }}</p>
+      </div>
+      <button type="button" class="forum-close" (click)="closeChat()">×</button>
+    </div>
+
+    <div class="forum-modal__body">
+      <article *ngFor="let message of chatMessages[request.id]" class="forum-chat-message">
+        <div class="forum-chat-message__avatar">👤</div>
+        <div class="forum-chat-message__bubble" [class.forum-chat-message__bubble--system]="message.sender === 'system'">
+          <p>{{ message.text }}</p>
+          <span>{{ message.meta }}</span>
+        </div>
+      </article>
+    </div>
+
+    <div class="forum-modal__composer">
+      <input
+        type="text"
+        [(ngModel)]="chatDraft"
+        (keydown.enter)="sendChatMessage()"
+        placeholder="Écrivez votre message..."
+      />
+      <button type="button" (click)="sendChatMessage()">✈️</button>
+    </div>
+  </div>
+</div>
+
+<div class="forum-modal-backdrop" *ngIf="showHelpModal" (click)="closeHelpModal()">
+  <div class="forum-modal forum-modal--help" (click)="$event.stopPropagation()">
+    <div class="forum-modal__header">
+      <div>
+        <h3>Demander de l'aide</h3>
+      </div>
+      <button type="button" class="forum-close" (click)="closeHelpModal()">×</button>
+    </div>
+
+    <div class="forum-help-note">
+      📢 Votre demande sera envoyée à tous les étudiants de votre année (L2 Informatique). Ceux
+      qui souhaitent vous aider pourront ouvrir un chat privé avec vous.
+    </div>
+
+    <label class="forum-field">
+      <span>Sujet</span>
+      <input type="text" [(ngModel)]="helpSubject" placeholder="Ex: Aide sur les boucles en Java" />
+    </label>
+
+    <label class="forum-field">
+      <span>Message</span>
+      <textarea
+        rows="4"
+        [(ngModel)]="helpMessage"
+        placeholder="Décrivez votre problème en détail..."
+      ></textarea>
+    </label>
+
+    <div class="forum-modal__actions">
+      <button type="button" class="forum-secondary" (click)="closeHelpModal()">Annuler</button>
+      <button
+        type="button"
+        class="forum-primary"
+        [disabled]="!helpSubject.trim() || !helpMessage.trim()"
+        (click)="submitHelpRequest()"
+      >
+        Envoyer la demande
+      </button>
+    </div>
+  </div>
+</div>
+>>>>>>> souhail

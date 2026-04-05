@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
@@ -320,5 +321,27 @@ export class AppComponent implements OnInit, OnDestroy {
     const query = params.toString();
     const nextUrl = query ? `${window.location.pathname}?${query}` : window.location.pathname;
     window.history.replaceState({}, '', nextUrl);
+=======
+import { Component, signal } from '@angular/core';
+import { Login } from './components/login/login';
+import { StudentDashboard } from './components/student-dashboard/student-dashboard';
+
+@Component({
+  selector: 'app-root',
+  imports: [StudentDashboard, Login],
+  templateUrl: './app.html',
+  styleUrl: './app.css',
+})
+export class App {
+  protected readonly title = signal('EduVia-Frontend');
+  isLoggedIn = signal(false);
+
+  onLogin(_event: { role: 'student' | null; email: string; password: string }) {
+    this.isLoggedIn.set(true);
+  }
+
+  onLogout() {
+    this.isLoggedIn.set(false);
+>>>>>>> souhail
   }
 }

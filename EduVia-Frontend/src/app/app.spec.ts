@@ -1,10 +1,18 @@
 import { TestBed } from '@angular/core/testing';
+<<<<<<< HEAD
 import { AppComponent } from './app';
+=======
+import { App } from './app';
+>>>>>>> souhail
 
 describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
+<<<<<<< HEAD
       imports: [AppComponent],
+=======
+      imports: [App],
+>>>>>>> souhail
     }).compileComponents();
   });
 

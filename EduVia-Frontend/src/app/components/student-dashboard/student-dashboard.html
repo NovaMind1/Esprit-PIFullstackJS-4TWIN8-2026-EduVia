@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <div class="dashboard-container">
   <!-- Header -->
   <header class="dashboard-header">
@@ -103,5 +104,281 @@
   <!-- Chatbot -->
   <div *ngIf="showChatbot" class="chatbot-overlay">
     <app-chatbot (close)="toggleChatbot()"></app-chatbot>
+=======
+<div class="student-shell">
+  <header class="student-header">
+    <div class="brand-block">
+      <div class="logo-wrapper">
+        <img src="logo.png" alt="Eduvia logo" class="dashboard-logo">
+      </div>
+      <div class="title-wrapper">
+        <h1>Espace Etudiant</h1>
+        <p class="student-name">EduVia - Learn smart. Think EduVia.</p>
+      </div>
+    </div>
+
+    <button mat-stroked-button class="logout-button" (click)="onLogout()">
+      <mat-icon>logout</mat-icon>
+      Deconnexion
+    </button>
+  </header>
+
+  <nav class="student-tabs">
+    <button
+      *ngFor="let tab of tabs"
+      type="button"
+      class="student-tab"
+      [class.active]="activeTab === tab.id"
+      (click)="setActiveTab(tab.id)"
+    >
+      {{ tab.label }}
+    </button>
+  </nav>
+
+  <section *ngIf="activeTab === 'parcours'" class="student-content">
+    <div *ngIf="loading && filteredCourseCatalog.length === 0" class="embedded-section">Chargement des contenus...</div>
+    <div *ngIf="error" class="embedded-section">{{ error }}</div>
+
+    <ng-container *ngIf="!selectedCourse; else selectedCourseView">
+      <section class="catalog-hero">
+        <div class="catalog-hero__icon">
+          <mat-icon>school</mat-icon>
+        </div>
+        <div class="catalog-hero__copy">
+          <h2>Mes Cours Disponibles</h2>
+          <p>Choisissez un cours pour commencer votre apprentissage</p>
+        </div>
+      </section>
+
+      <section class="catalog-toolbar">
+        <div class="catalog-search">
+          <mat-icon>search</mat-icon>
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="updateFilteredCourseCatalog()"
+            placeholder="Rechercher un cours..."
+          />
+        </div>
+
+        <div class="catalog-select">
+          <mat-icon>filter_list</mat-icon>
+          <select [(ngModel)]="selectedLevelFilter" (ngModelChange)="updateFilteredCourseCatalog()">
+            <option *ngFor="let level of levelFilters" [ngValue]="level">{{ level }}</option>
+          </select>
+        </div>
+
+        <div class="catalog-select">
+          <select [(ngModel)]="selectedSort" (ngModelChange)="updateFilteredCourseCatalog()">
+            <option *ngFor="let sort of sortOptions" [ngValue]="sort">{{ sort }}</option>
+          </select>
+        </div>
+      </section>
+
+      <section class="catalog-section">
+        <div class="catalog-section__header">
+          <h2>Tous les cours</h2>
+          <span>{{ filteredCourseCatalog.length }} cours disponibles</span>
+        </div>
+
+        <div class="catalog-grid" *ngIf="filteredCourseCatalog.length > 0; else emptyCourses">
+          <article class="course-card" *ngFor="let course of filteredCourseCatalog">
+            <div class="course-card__cover" [style.background]="course.coverStyle">
+              <span class="course-card__accent" [style.background]="course.accent"></span>
+            </div>
+
+            <div class="course-card__body">
+              <div class="course-card__title-row">
+                <h3>{{ course.title }}</h3>
+                <span class="course-pill" [class]="courseLevelClass(course.level)">{{ course.level }}</span>
+              </div>
+
+              <p class="course-card__description">{{ course.description }}</p>
+
+              <div class="course-card__meta">
+                <span><mat-icon>menu_book</mat-icon>{{ course.chapters }} chapitres</span>
+                <span><mat-icon>schedule</mat-icon>{{ course.hours }} heures</span>
+              </div>
+
+              <div class="course-card__meta">
+                <span><mat-icon>groups</mat-icon>{{ course.students }} etudiants</span>
+                <span><mat-icon>star</mat-icon>{{ course.rating }}</span>
+              </div>
+
+              <div class="course-card__footer">
+                <div class="course-teacher">
+                  <mat-icon>person_outline</mat-icon>
+                  <span>{{ course.teacher }}</span>
+                </div>
+
+                <button type="button" class="action-button action-button--compact" (click)="openCourse(course)">
+                  Continuer
+                </button>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <ng-template #emptyCourses>
+          <div class="embedded-section">Aucun cours disponible pour le moment.</div>
+        </ng-template>
+      </section>
+    </ng-container>
+
+    <ng-template #selectedCourseView>
+      <section *ngIf="selectedCourse as course" class="course-view">
+        <div class="course-view__hero" [style.background]="course.coverStyle">
+          <span class="course-view__accent" [style.background]="course.accent"></span>
+          <div class="course-view__overlay">
+            <button type="button" class="course-view__back" (click)="closeSelectedCourse()">
+              <mat-icon>arrow_back</mat-icon>
+              Retour aux cours
+            </button>
+
+            <div class="course-view__title-row">
+              <div>
+                <p class="course-view__eyebrow">Espace cours</p>
+                <h2>{{ course.title }}</h2>
+                <p class="course-view__description">
+                  Explorez uniquement les documents, videos et quiz de ce cours.
+                </p>
+              </div>
+
+              <span class="course-pill" [class]="courseLevelClass(course.level)">{{ course.level }}</span>
+            </div>
+
+            <div class="course-view__meta">
+              <span><mat-icon>menu_book</mat-icon>{{ course.chapters }} chapitres</span>
+              <span><mat-icon>schedule</mat-icon>{{ course.hours }} heures</span>
+              <span><mat-icon>groups</mat-icon>{{ course.students }} etudiants</span>
+              <span><mat-icon>person_outline</mat-icon>{{ course.teacher }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="course-view__content">
+          <ng-container *ngIf="selectedStandaloneQuizId; else selectedCourseResourcesView">
+            <div class="course-view__section-head">
+              <h3>Quiz du cours</h3>
+              <span>Interface independante</span>
+            </div>
+
+            <app-course-quiz
+              [studentLevel]="studentLevel"
+              [standalone]="true"
+              [selectedQuizId]="selectedStandaloneQuizId"
+              [standaloneQuizData]="selectedStandaloneQuiz"
+              (closed)="closeStandaloneQuiz()"
+            ></app-course-quiz>
+          </ng-container>
+
+          <ng-template #selectedCourseResourcesView>
+          <div class="course-view__section-head">
+            <h3>Contenus du cours</h3>
+            <span>{{ selectedCourseResources.length }} ressource(s)</span>
+          </div>
+
+          <ng-container *ngIf="selectedCourseResources.length > 0; else emptyCourseResources">
+            <article *ngFor="let item of selectedCourseResources" class="recommendation-card">
+              <div class="recommendation-card__icon">
+                <mat-icon>{{ item.icon }}</mat-icon>
+              </div>
+
+              <div class="recommendation-card__body">
+                <h3>{{ item.title }}</h3>
+
+                <div class="recommendation-meta">
+                  <span class="badge" [class]="'badge--' + recommendationTypeClass(item.type)">{{ item.type }}</span>
+                  <span class="badge badge--level">{{ item.level }}</span>
+                  <span class="meta-time">
+                    <mat-icon>schedule</mat-icon>
+                    {{ item.duration }}
+                  </span>
+                </div>
+
+                <p class="recommendation-reason">
+                  <mat-icon>topic</mat-icon>
+                  {{ item.reason }}
+                </p>
+              </div>
+
+              <button type="button" class="action-button" (click)="startRecommendation(item)">
+                {{ recommendationActionLabel(item) }}
+              </button>
+            </article>
+          </ng-container>
+
+          <ng-template #emptyCourseResources>
+            <div class="embedded-section">Aucun contenu visible pour ce cours a votre niveau.</div>
+          </ng-template>
+          </ng-template>
+        </div>
+      </section>
+    </ng-template>
+  </section>
+
+  <section *ngIf="activeTab === 'evaluation'" class="embedded-section">
+    <app-ai-assessment></app-ai-assessment>
+  </section>
+
+  <section *ngIf="activeTab === 'quiz'" class="embedded-section">
+    <div class="embedded-section embedded-section--empty">
+      <h2>Espace Quiz</h2>
+      <p>Cette section est maintenant vide et prete pour votre prochain travail.</p>
+    </div>
+  </section>
+
+  <section *ngIf="activeTab === 'communaute'" class="embedded-section">
+    <app-student-forum></app-student-forum>
+  </section>
+
+  <section *ngIf="activeTab === 'clubs'" class="embedded-section">
+    <app-club-suggestions></app-club-suggestions>
+  </section>
+
+  <section *ngIf="activeTab === 'assistant'" class="embedded-section assistant-panel">
+    <app-chatbot></app-chatbot>
+  </section>
+
+  <section *ngIf="activeTab === 'parametres'" class="embedded-section">
+    <app-rating-system></app-rating-system>
+  </section>
+
+  <div class="preview-overlay" *ngIf="selectedRecommendation as selected" (click)="closeRecommendationPreview()">
+    <div class="preview-modal" (click)="$event.stopPropagation()">
+      <div class="preview-modal__header">
+        <div>
+          <p class="preview-path">{{ selected.courseId || 'Cours' }} > {{ selected.chapterId || 'Chapitre' }}</p>
+          <h2>{{ selected.title }}</h2>
+        </div>
+        <button type="button" class="preview-close" (click)="closeRecommendationPreview()">X</button>
+      </div>
+
+      <div class="preview-modal__body">
+        <ng-container [ngSwitch]="selected.contentType.toLowerCase()">
+          <div *ngSwitchCase="'document'" class="preview-frame-wrap">
+            <iframe
+              *ngIf="previewUrl"
+              class="preview-frame"
+              [src]="previewUrl"
+              title="Apercu document etudiant"
+            ></iframe>
+            <p *ngIf="!previewUrl" class="preview-empty">Document indisponible.</p>
+          </div>
+
+          <div *ngSwitchCase="'video'" class="preview-frame-wrap">
+            <video *ngIf="previewUrl" class="preview-video" controls>
+              <source [src]="previewUrl" />
+            </video>
+            <p *ngIf="!previewUrl" class="preview-empty">Video indisponible.</p>
+          </div>
+
+          <div *ngSwitchDefault class="preview-empty">
+            Ce contenu s'ouvre dans l'onglet Quiz.
+          </div>
+        </ng-container>
+      </div>
+    </div>
+>>>>>>> souhail
   </div>
 </div>

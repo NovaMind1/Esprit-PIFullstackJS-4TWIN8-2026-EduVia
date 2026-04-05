@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 :host {
   display: block;
 }
@@ -168,17 +169,64 @@
 
 .field {
   gap: 0.55rem;
+=======
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: 1rem;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 360px;
+  background: white;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.login-logo {
+  max-width: 80px;
+  margin-bottom: 1rem;
+}
+
+.login-card h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.login-card p {
+  color: #666;
+  margin: 0.5rem 0 1.5rem;
+}
+
+.field {
+  text-align: left;
+>>>>>>> souhail
   margin-bottom: 1rem;
 }
 
 .field label {
+<<<<<<< HEAD
   color: #35151a;
   font-size: 0.98rem;
   font-weight: 700;
+=======
+  display: block;
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+  color: #555;
+>>>>>>> souhail
 }
 
 .field input {
   width: 100%;
+<<<<<<< HEAD
   min-height: 3.45rem;
   padding: 0 1rem;
   border: 1px solid #e0c3c8;
@@ -549,10 +597,23 @@
 
 .back-link {
   margin-top: 1rem;
+=======
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.error-message {
+  color: #c00;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+>>>>>>> souhail
 }
 
 .submit-btn {
   width: 100%;
+<<<<<<< HEAD
   min-height: 3.6rem;
   margin-top: 1.25rem;
   border: 0;
@@ -622,4 +683,7 @@
   .captcha-card {
     padding: 0.85rem;
   }
+=======
+  padding: 0.75rem;
+>>>>>>> souhail
 }

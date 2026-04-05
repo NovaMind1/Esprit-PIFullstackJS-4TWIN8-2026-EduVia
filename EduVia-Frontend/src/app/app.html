@@ -1,4 +1,5 @@
 <div class="app-container">
+<<<<<<< HEAD
   @if (transientNotificationMessage()) {
     <div class="floating-warning" role="alert" aria-live="assertive">
       <span>{{ transientNotificationMessage() }}</span>
@@ -45,4 +46,11 @@
   @else if (userRole() === 'admin') {
     <app-admin-dashboard (logout)="onLogout()" />
   }
+=======
+  @if (!isLoggedIn()) {
+    <app-login [role]="'student'" (login)="onLogin($event)" />
+  } @else {
+    <app-student-dashboard (logout)="onLogout()" />
+  }
+>>>>>>> souhail
 </div>

@@ -10,7 +10,11 @@
     "src/**/*.ts"
   ],
   "exclude": [
+<<<<<<< HEAD
     "src/**/*.spec.ts",
     "Educational Platform Template/**/*"
+=======
+    "src/**/*.spec.ts"
+>>>>>>> souhail
   ]
 }
