@@ -6,7 +6,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+<<<<<<< HEAD
 import { AuthService } from '../../../services/auth.service';
+=======
+>>>>>>> mayarahachani
 
 @Component({
   selector: 'app-change-password',
@@ -21,7 +24,11 @@ import { AuthService } from '../../../services/auth.service';
     MatSnackBarModule,
   ],
   templateUrl: './change-password.html',
+<<<<<<< HEAD
   styleUrls: ['./change-password.css'],
+=======
+  styleUrl: './change-password.css',
+>>>>>>> mayarahachani
   standalone: true,
 })
 export class ChangePasswordComponent {
@@ -31,7 +38,11 @@ export class ChangePasswordComponent {
   showNewPassword = false;
   showConfirmPassword = false;
 
+<<<<<<< HEAD
   constructor(private fb: FormBuilder, private snackBar: MatSnackBar, private auth: AuthService) {
+=======
+  constructor(private fb: FormBuilder, private snackBar: MatSnackBar) {
+>>>>>>> mayarahachani
     this.passwordForm = this.fb.group({
       currentPassword: ['', Validators.required],
       newPassword: ['', [Validators.required, Validators.minLength(8)]],
@@ -62,6 +73,7 @@ export class ChangePasswordComponent {
   onSubmit() {
     if (this.passwordForm.valid) {
       this.isLoading = true;
+<<<<<<< HEAD
       const payload = {
         currentPassword: this.passwordForm.get('currentPassword')?.value,
         newPassword: this.passwordForm.get('newPassword')?.value,
@@ -90,6 +102,19 @@ export class ChangePasswordComponent {
           this.snackBar.open(msg, 'Fermer', { duration: 4000, horizontalPosition: 'end', verticalPosition: 'top' });
         },
       });
+=======
+      // Simulé appel API
+      setTimeout(() => {
+        this.isLoading = false;
+        this.snackBar.open('Mot de passe changé avec succès!', 'Fermer', {
+          duration: 3000,
+          horizontalPosition: 'end',
+          verticalPosition: 'top',
+          panelClass: ['success-snackbar'],
+        });
+        this.onCancel();
+      }, 1500);
+>>>>>>> mayarahachani
     }
   }
 

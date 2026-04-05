@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { Component } from '@angular/core';
 
 @Component({
@@ -10,6 +11,8 @@ import { Component } from '@angular/core';
 export class StudentForum {
 
 =======
+=======
+>>>>>>> mayarahachani
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -225,5 +228,8 @@ export class StudentForum {
 
     this.chatDraft = '';
   }
+<<<<<<< HEAD
 >>>>>>> souhail
+=======
+>>>>>>> mayarahachani
 }

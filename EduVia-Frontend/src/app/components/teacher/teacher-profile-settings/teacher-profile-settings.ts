@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -11,11 +12,19 @@ import {
 } from '@angular/forms';
 import { delay, Subscription } from 'rxjs';
 import { MatTabsModule } from '@angular/material/tabs';
+=======
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatCardModule } from '@angular/material/card';
+>>>>>>> mayarahachani
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+<<<<<<< HEAD
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -42,6 +51,8 @@ interface ProfileFormValue {
   bio: string;
   avatarDataUrl: string;
 }
+=======
+>>>>>>> mayarahachani
 
 @Component({
   selector: 'app-teacher-profile-settings',
@@ -50,10 +61,15 @@ interface ProfileFormValue {
     FormsModule,
     ReactiveFormsModule,
     MatTabsModule,
+<<<<<<< HEAD
+=======
+    MatCardModule,
+>>>>>>> mayarahachani
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
     MatIconModule,
+<<<<<<< HEAD
     MatDatepickerModule,
     MatNativeDateModule,
     MatCheckboxModule,
@@ -263,10 +279,43 @@ export class TeacherProfileSettingsComponent implements OnInit, OnDestroy {
         this.selectedTab = 2;
         this.snackBar.open('Profil mis a jour avec succes!', 'Fermer', {
           duration: 2500,
+=======
+    MatSnackBarModule,
+  ],
+  templateUrl: './teacher-profile-settings.html',
+  styleUrl: './teacher-profile-settings.css',
+  standalone: true,
+})
+export class TeacherProfileSettingsComponent {
+  selectedTab = 0;
+  profileForm: FormGroup;
+  isLoading = false;
+
+  constructor(private fb: FormBuilder, private snackBar: MatSnackBar) {
+    this.profileForm = this.fb.group({
+      fullName: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      phone: ['', Validators.required],
+      birthdate: ['', Validators.required],
+      specialization: ['', Validators.required],
+      address: ['', Validators.required],
+      bio: ['', Validators.maxLength(500)],
+    });
+  }
+
+  onSubmit() {
+    if (this.profileForm.valid) {
+      this.isLoading = true;
+      setTimeout(() => {
+        this.isLoading = false;
+        this.snackBar.open('Profil mis à jour avec succès!', 'Fermer', {
+          duration: 3000,
+>>>>>>> mayarahachani
           horizontalPosition: 'end',
           verticalPosition: 'top',
           panelClass: ['success-snackbar'],
         });
+<<<<<<< HEAD
         this.announceText('Profil mis a jour avec succes.');
       },
       error: (error) => {
@@ -781,3 +830,10 @@ export class TeacherProfileSettingsComponent implements OnInit, OnDestroy {
     });
   }
 }
+=======
+      }, 1500);
+    }
+  }
+}
+
+>>>>>>> mayarahachani

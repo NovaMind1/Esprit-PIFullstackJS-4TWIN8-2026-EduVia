@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 :host {
   display: block;
 }
@@ -170,6 +171,8 @@
 .field {
   gap: 0.55rem;
 =======
+=======
+>>>>>>> mayarahachani
 .login-container {
   display: flex;
   justify-content: center;
@@ -207,25 +210,35 @@
 
 .field {
   text-align: left;
+<<<<<<< HEAD
 >>>>>>> souhail
+=======
+>>>>>>> mayarahachani
   margin-bottom: 1rem;
 }
 
 .field label {
 <<<<<<< HEAD
+<<<<<<< HEAD
   color: #35151a;
   font-size: 0.98rem;
   font-weight: 700;
 =======
+=======
+>>>>>>> mayarahachani
   display: block;
   font-size: 0.875rem;
   margin-bottom: 0.25rem;
   color: #555;
+<<<<<<< HEAD
 >>>>>>> souhail
+=======
+>>>>>>> mayarahachani
 }
 
 .field input {
   width: 100%;
+<<<<<<< HEAD
 <<<<<<< HEAD
   min-height: 3.45rem;
   padding: 0 1rem;
@@ -598,6 +611,8 @@
 .back-link {
   margin-top: 1rem;
 =======
+=======
+>>>>>>> mayarahachani
   padding: 0.5rem;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -608,11 +623,15 @@
   color: #c00;
   margin-bottom: 1rem;
   font-size: 0.875rem;
+<<<<<<< HEAD
 >>>>>>> souhail
+=======
+>>>>>>> mayarahachani
 }
 
 .submit-btn {
   width: 100%;
+<<<<<<< HEAD
 <<<<<<< HEAD
   min-height: 3.6rem;
   margin-top: 1.25rem;
@@ -686,4 +705,7 @@
 =======
   padding: 0.75rem;
 >>>>>>> souhail
+=======
+  padding: 0.75rem;
+>>>>>>> mayarahachani
 }

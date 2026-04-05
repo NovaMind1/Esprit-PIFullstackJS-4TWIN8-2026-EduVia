@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { Component } from '@angular/core';
 
 @Component({
@@ -10,6 +11,8 @@ import { Component } from '@angular/core';
 export class Chatbot {
 
 =======
+=======
+>>>>>>> mayarahachani
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Component } from '@angular/core';
@@ -137,5 +140,8 @@ export class Chatbot {
 
     return "Je n'ai pas pu contacter le service IA a temps, mais je peux deja vous aider si vous reformulez votre question de facon plus precise, par exemple sur SQL, algorithmique, machine learning ou un exercice.";
   }
+<<<<<<< HEAD
 >>>>>>> souhail
+=======
+>>>>>>> mayarahachani
 }

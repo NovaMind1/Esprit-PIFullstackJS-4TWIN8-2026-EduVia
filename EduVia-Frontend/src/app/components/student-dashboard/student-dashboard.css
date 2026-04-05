@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 .dashboard-container {
   padding: 0.85rem;
 }
@@ -47,6 +48,8 @@
   display: flex;
   align-items: center;
 =======
+=======
+>>>>>>> mayarahachani
 .student-shell {
   --panel-bg: #ffffff;
   --page-bg: #f8fbff;
@@ -80,7 +83,10 @@
   display: flex;
   align-items: center;
   gap: 1.25rem;
+<<<<<<< HEAD
 >>>>>>> souhail
+=======
+>>>>>>> mayarahachani
 }
 
 .dashboard-logo {
@@ -88,6 +94,7 @@
   height: auto;
 }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 .header-userline {
   display: flex;
@@ -207,6 +214,8 @@
   right: 1rem;
   z-index: 1000;
 =======
+=======
+>>>>>>> mayarahachani
 .title-wrapper h1 {
   margin: 0;
   font-size: 1.8rem;
@@ -1205,5 +1214,8 @@
   .preview-modal__header h2 {
     font-size: 1.5rem;
   }
+<<<<<<< HEAD
 >>>>>>> souhail
+=======
+>>>>>>> mayarahachani
 }

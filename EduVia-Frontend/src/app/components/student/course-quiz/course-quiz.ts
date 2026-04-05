@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { Component } from '@angular/core';
 
 @Component({
@@ -10,6 +11,8 @@ import { Component } from '@angular/core';
 export class CourseQuiz {
 
 =======
+=======
+>>>>>>> mayarahachani
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -369,5 +372,8 @@ export class CourseQuiz implements OnInit, OnChanges {
 
     this.startQuiz(targetQuiz);
   }
+<<<<<<< HEAD
 >>>>>>> souhail
+=======
+>>>>>>> mayarahachani
 }

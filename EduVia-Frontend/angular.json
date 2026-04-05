@@ -22,10 +22,14 @@
             "assets": [
               {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "glob": "**/*",
 =======
                 "glob": "*/",
 >>>>>>> souhail
+=======
+                "glob": "*/",
+>>>>>>> mayarahachani
                 "input": "public"
               }
             ],
@@ -45,12 +49,17 @@
                 {
                   "type": "anyComponentStyle",
 <<<<<<< HEAD
+<<<<<<< HEAD
                   "maximumWarning": "4kB",
                   "maximumError": "8kB"
 =======
                   "maximumWarning": "14kB",
                   "maximumError": "18kB"
 >>>>>>> souhail
+=======
+                  "maximumWarning": "6kB",
+                  "maximumError": "10kB"
+>>>>>>> mayarahachani
                 }
               ],
               "outputHashing": "all"

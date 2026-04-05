@@ -5,9 +5,14 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+<<<<<<< HEAD
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { AuthService } from '../../../services/auth.service';
+=======
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatTabsModule } from '@angular/material/tabs';
+>>>>>>> mayarahachani
 
 @Component({
   selector: 'app-update-profile',
@@ -19,18 +24,30 @@ import { AuthService } from '../../../services/auth.service';
     MatInputModule,
     MatButtonModule,
     MatIconModule,
+<<<<<<< HEAD
     MatTabsModule,
     MatSnackBarModule,
   ],
   templateUrl: './update-profile.html',
   styleUrls: ['./update-profile.css'],
+=======
+    MatSnackBarModule,
+    MatTabsModule,
+  ],
+  templateUrl: './update-profile.html',
+  styleUrl: './update-profile.css',
+>>>>>>> mayarahachani
   standalone: true,
 })
 export class UpdateProfileComponent {
   profileForm: FormGroup;
   isLoading = false;
 
+<<<<<<< HEAD
   constructor(private fb: FormBuilder, private snackBar: MatSnackBar, private auth: AuthService) {
+=======
+  constructor(private fb: FormBuilder, private snackBar: MatSnackBar) {
+>>>>>>> mayarahachani
     this.profileForm = this.fb.group({
       fullName: ['Jean Dupont', Validators.required],
       email: ['jean.dupont@example.com', [Validators.required, Validators.email]],
@@ -40,6 +57,7 @@ export class UpdateProfileComponent {
       address: ['Paris, France', Validators.required],
       bio: ['Professeur passionné par l\'informatique', Validators.maxLength(500)],
     });
+<<<<<<< HEAD
 
     // try to load profile from backend if available
     this.auth.getProfile().subscribe({
@@ -60,11 +78,14 @@ export class UpdateProfileComponent {
         // ignore; keep defaults
       },
     });
+=======
+>>>>>>> mayarahachani
   }
 
   onSubmit() {
     if (this.profileForm.valid) {
       this.isLoading = true;
+<<<<<<< HEAD
       const payload = this.profileForm.value;
       this.auth.updateProfile(payload).subscribe({
         next: () => {
@@ -82,6 +103,18 @@ export class UpdateProfileComponent {
           this.snackBar.open(msg, 'Fermer', { duration: 4000, horizontalPosition: 'end', verticalPosition: 'top' });
         },
       });
+=======
+      // Simulé appel API
+      setTimeout(() => {
+        this.isLoading = false;
+        this.snackBar.open('Profil mis à jour avec succès!', 'Fermer', {
+          duration: 3000,
+          horizontalPosition: 'end',
+          verticalPosition: 'top',
+          panelClass: ['success-snackbar'],
+        });
+      }, 1500);
+>>>>>>> mayarahachani
     }
   }
 

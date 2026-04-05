@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Component, OnDestroy, OnInit, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -554,4 +555,16 @@ export class UserManagement implements OnInit, OnDestroy {
 
     return 'pending';
   }
+=======
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-user-management',
+  imports: [],
+  templateUrl: './user-management.html',
+  styleUrl: './user-management.css',
+})
+export class UserManagement {
+
+>>>>>>> mayarahachani
 }

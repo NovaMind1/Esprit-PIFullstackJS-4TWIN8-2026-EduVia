@@ -1,1 +1,531 @@
+<<<<<<< HEAD
 <p>content-management works!</p>
+=======
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header-card">
+    <div class="header-left">
+      <div class="icon">
+        <i class="fa-solid fa-book-open"></i>
+      </div>
+      <div>
+        <h2>Gestion des Contenus Pédagogiques</h2>
+        <p>
+          Ajoutez, modifiez ou supprimez des cours, vidéos, quiz et exercices.
+          Consultez les statistiques de consultation et de satisfaction.
+        </p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn-secondary" type="button" (click)="openAutoQuizModal()">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+        Quiz auto
+      </button>
+      <button class="btn-primary" type="button" (click)="openModal()">
+        <i class="fa-solid fa-plus"></i>
+        Nouveau contenu
+      </button>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card" *ngFor="let type of contentTypes">
+      <i class="fa-solid" [ngClass]="{
+        'fa-book icon-blue': type === 'Cours',
+        'fa-video icon-red': type === 'Vidéo',
+        'fa-file-circle-question icon-green': type === 'Quiz',
+        'fa-pen icon-purple': type === 'Exercice',
+        'fa-file icon-indigo': type === 'Document'
+      }"></i>
+      <p>{{ type }}</p>
+      <h3>{{ countByType(type) }}</h3>
+    </div>
+  </div>
+
+  <!-- LISTE STRUCTUREE -->
+  <h3 class="section-title">Tous les contenus</h3>
+
+  <div class="structure-wrapper">
+    <div *ngFor="let course of courseKeysList" class="course-card">
+      <div class="course-card-header" (click)="toggleCourse(course)">
+        <div class="folder-row">
+          <span class="status-dot"></span>
+          <i class="fa-regular fa-folder"></i>
+          <strong>{{ course }}</strong>
+          <span class="course-count">{{ courseTotal(course) }} elements</span>
+        </div>
+        <div class="course-header-actions">
+          <div class="course-menu-wrap">
+            <button
+              class="menu-btn"
+              type="button"
+              aria-label="Menu du cours"
+              (click)="toggleCourseMenu(course, $event)"
+            >
+              <span class="menu-dots" aria-hidden="true">...</span>
+            </button>
+            <div class="course-menu" *ngIf="openedCourseMenu === course">
+              <button type="button" class="course-menu-item" (click)="addLinkedContent(course, $event)">
+                Ajouter contenu lié
+              </button>
+              <button type="button" class="course-menu-item" (click)="editCourse(course, $event)">
+                Modifier
+              </button>
+              <button type="button" class="course-menu-item danger" (click)="deleteCourse(course, $event)">
+                Supprimer
+              </button>
+            </div>
+          </div>
+          <button class="toggle-btn" type="button" aria-label="Basculer le cours">
+            <i class="fa-solid" [ngClass]="courseExpanded[course] ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="course-contents" *ngIf="courseExpanded[course] !== false">
+        <div *ngFor="let chapter of getChapters(course)" class="chapter-block">
+          <div class="chapter-overview">
+            <div class="chapter-media">
+              <i class="fa-brands fa-microsoft"></i>
+            </div>
+            <div class="chapter-summary">
+              <h4>{{ chapter }}</h4>
+              <p>{{ chapterDescription(course, chapter) }}</p>
+            </div>
+          </div>
+
+          <div class="chapter-row" (click)="toggleChapter(course, chapter)">
+            <div class="chapter-main">
+              <span class="status-dot"></span>
+              <i class="fa-regular fa-folder"></i>
+              <strong>{{ chapter }}</strong>
+            </div>
+            <i
+              class="fa-solid chapter-chevron"
+              [ngClass]="chapterExpanded[course + '|' + chapter] ? 'fa-chevron-up' : 'fa-chevron-down'"
+            ></i>
+          </div>
+
+          <div class="parts-list" *ngIf="chapterExpanded[course + '|' + chapter] !== false">
+              <div *ngFor="let part of getParts(course, chapter)" class="part-block">
+                <div class="part-row" (click)="togglePart(course, chapter, part)">
+                  <div class="part-main-wrap">
+                    <div class="part-main">
+                      <span class="status-dot"></span>
+                      <i class="fa-regular fa-folder-open"></i>
+                      <strong>{{ part }}</strong>
+                    </div>
+                    <div class="course-menu-wrap">
+                      <button
+                        class="menu-btn"
+                        type="button"
+                        aria-label="Menu de la partie"
+                        (click)="togglePartMenu(course, chapter, part, $event)"
+                      >
+                        <span class="menu-dots" aria-hidden="true">...</span>
+                      </button>
+                      <div class="course-menu" *ngIf="openedPartMenu === course + '|' + chapter + '|' + part">
+                        <button
+                          type="button"
+                          class="course-menu-item danger"
+                          (click)="deletePart(course, chapter, part, $event)"
+                        >
+                          Supprimer
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <i
+                    class="fa-solid chapter-chevron"
+                    [ngClass]="partExpanded[course + '|' + chapter + '|' + part] ? 'fa-chevron-up' : 'fa-chevron-down'"
+                  ></i>
+              </div>
+
+              <div class="item-list" *ngIf="partExpanded[course + '|' + chapter + '|' + part] !== false">
+                <div *ngFor="let item of getItemsForPart(course, chapter, part)" class="item-row">
+                  <div class="item-main" (click)="openPreview(item)">
+                    <span class="status-dot"></span>
+                    <i
+                      class="fa-regular"
+                      [ngClass]="{
+                        'fa-file-lines': item.type === 'Document',
+                        'fa-circle-play': item.type === 'Vidéo',
+                        'fa-clipboard-check': item.type === 'Quiz'
+                      }"
+                    ></i>
+                    <div class="item-text">
+                      <strong>{{ item.title }}</strong>
+                      <p *ngIf="item.dueDate" class="due">Date d'echeance : {{ item.dueDate }}</p>
+                    </div>
+                  </div>
+                  <div class="course-menu-wrap">
+                    <button
+                      class="menu-btn"
+                      type="button"
+                      aria-label="Menu du contenu"
+                      (click)="toggleItemMenu(item, $event)"
+                    >
+                      <span class="menu-dots" aria-hidden="true">...</span>
+                    </button>
+                    <div
+                      class="course-menu"
+                      *ngIf="openedItemMenu === (item._id || (item.courseId + '|' + item.chapterId + '|' + item.partId + '|' + item.title))"
+                    >
+                      <button
+                        type="button"
+                        class="course-menu-item danger"
+                        (click)="deleteContent(item)"
+                      >
+                        Supprimer
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="preview-overlay" *ngIf="selectedPreviewItem">
+  <div class="preview-card">
+    <div class="preview-topbar">
+      <div class="preview-breadcrumb">Sommaire > {{ selectedPreviewItem.chapterId }}</div>
+      <button class="preview-close" (click)="closePreview()">
+        <span class="close-mark" aria-hidden="true">X</span>
+      </button>
+    </div>
+    <div class="preview-title">
+      <h2>{{ selectedPreviewItem.title }}</h2>
+    </div>
+    <div class="preview-body">
+      <div class="preview-toolbar">
+        <span>Page 1</span>
+        <div class="preview-actions">
+          <i class="fa-solid fa-minus"></i>
+          <i class="fa-solid fa-plus"></i>
+          <i class="fa-solid fa-expand"></i>
+        </div>
+      </div>
+      <div
+        *ngIf="isQuizItem(selectedPreviewItem) && previewQuizQuestions(selectedPreviewItem).length"
+        class="quiz-preview"
+      >
+        <div
+          *ngFor="let question of previewQuizQuestions(selectedPreviewItem); let index = index"
+          class="quiz-preview-question"
+        >
+          <div class="quiz-preview-header">
+            <div class="quiz-preview-index">{{ index + 1 }}</div>
+            <div>
+              <div class="quiz-preview-type">{{ quizQuestionTypeLabel(question) }}</div>
+              <h3>{{ question.prompt }}</h3>
+            </div>
+          </div>
+
+          <div class="quiz-preview-options">
+            <div
+              *ngFor="let option of question.options"
+              class="quiz-preview-option"
+              [class.correct]="isCorrectQuizOption(question, option.label)"
+            >
+              <div class="quiz-option-badge">{{ option.label }}</div>
+              <div class="quiz-option-text">
+                <strong>{{ option.text }}</strong>
+                <small *ngIf="isCorrectQuizOption(question, option.label)">
+                  Bonne réponse
+                </small>
+              </div>
+            </div>
+          </div>
+
+          <p *ngIf="question.explanation" class="quiz-preview-explanation">
+            {{ question.explanation }}
+          </p>
+        </div>
+      </div>
+      <div
+        class="preview-placeholder"
+        *ngIf="(isQuizItem(selectedPreviewItem) && !previewQuizQuestions(selectedPreviewItem).length) || (!isQuizItem(selectedPreviewItem) && !previewSource(selectedPreviewItem))"
+      >
+        <i class="fa-regular fa-file-lines"></i>
+        <p>{{ selectedPreviewItem.fileName || selectedPreviewItem.title }}</p>
+        <small *ngIf="!isQuizItem(selectedPreviewItem)">
+          Aperçu indisponible: aucun fichier lié n'est configuré.
+        </small>
+        <small *ngIf="isQuizItem(selectedPreviewItem)">
+          Aperçu quiz indisponible: aucune question n'a été extraite depuis le fichier.
+        </small>
+      </div>
+      <video
+        *ngIf="!isQuizItem(selectedPreviewItem) && previewVideoUrl(selectedPreviewItem)"
+        class="preview-video"
+        controls
+        preload="metadata"
+        [src]="previewVideoUrl(selectedPreviewItem)"
+      ></video>
+      <iframe
+        *ngIf="!isQuizItem(selectedPreviewItem) && previewSource(selectedPreviewItem) && !previewVideoUrl(selectedPreviewItem)"
+        class="preview-frame"
+        [src]="previewSource(selectedPreviewItem)"
+        title="Aperçu du document"
+      ></iframe>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" *ngIf="showModal">
+  <div class="modal modal-large">
+
+    <div class="modal-header">
+      <h3>{{ editingCourseName ? 'Modifier le cours' : 'Ajouter une nouvelle structure de cours' }}</h3>
+      <button class="close" type="button" aria-label="Fermer" (click)="closeModal()">
+        <span class="close-mark" aria-hidden="true">X</span>
+      </button>
+    </div>
+
+    <div class="progress-bar-wizard">
+      <div class="progress-filled" [style.width]="progress + '%'" aria-label="Progression"></div>
+    </div>
+
+    <div class="step-labels">
+      <div [class.active]="currentStep >= 1">1. Cours & Chapitre</div>
+      <div [class.active]="currentStep >= 2">2. Partie</div>
+      <div [class.active]="currentStep >= 3">3. Document</div>
+      <div [class.active]="currentStep >= 4">4. Vidéo</div>
+      <div [class.active]="currentStep >= 5">5. Quiz</div>
+    </div>
+
+    <div class="form-content">
+      <div *ngIf="currentStep === 1" class="step-block">
+        <p class="step-subtitle">Étape 1 sur 5 - Cours et Chapitre</p>
+
+        <div class="split-row">
+          <div class="radio-group">
+            <button [class.selected]="contentForm.courseMode === 'existing'" (click)="contentForm.courseMode = 'existing'">Existant</button>
+            <button [class.selected]="contentForm.courseMode === 'new'" (click)="contentForm.courseMode = 'new'">Nouveau</button>
+          </div>
+
+          <select *ngIf="contentForm.courseMode === 'existing'" [(ngModel)]="contentForm.selectedCourse" (ngModelChange)="setCourse($event)">
+            <option value="" disabled>Selectionner un cours</option>
+            <option *ngFor="let c of courses" [value]="c">{{ c }}</option>
+          </select>
+
+          <input *ngIf="contentForm.courseMode === 'new'" [(ngModel)]="contentForm.newCourse" placeholder="Nom du nouveau cours" />
+        </div>
+
+        <div class="split-row">
+          <div class="radio-group">
+            <button [class.selected]="contentForm.chapterMode === 'existing'" (click)="contentForm.chapterMode = 'existing'">Existant</button>
+            <button [class.selected]="contentForm.chapterMode === 'new'" (click)="contentForm.chapterMode = 'new'">Nouveau</button>
+          </div>
+
+          <select *ngIf="contentForm.chapterMode === 'existing'" [(ngModel)]="contentForm.selectedChapter" (ngModelChange)="setChapter($event)">
+            <option value="" disabled>Selectionner un chapitre</option>
+            <option *ngFor="let c of chaptersByCourse[contentForm.selectedCourse] || []" [value]="c">{{ c }}</option>
+          </select>
+          <input *ngIf="contentForm.chapterMode === 'new'" [(ngModel)]="contentForm.newChapter" placeholder="Nom du nouveau chapitre" />
+        </div>
+
+        <div class="recap-box">
+          <strong>Récapitulatif :</strong><br>
+          Cours: {{ contentForm.courseMode === 'existing' ? contentForm.selectedCourse : contentForm.newCourse || '(non choisi)' }}<br>
+          Chapitre: {{ contentForm.chapterMode === 'existing' ? contentForm.selectedChapter : contentForm.newChapter || '(non choisi)' }}
+        </div>
+      </div>
+
+      <div *ngIf="currentStep === 2" class="step-block">
+        <p class="step-subtitle">Étape 2 sur 5 - Partie</p>
+
+        <div class="split-row">
+          <div class="radio-group">
+            <button [class.selected]="contentForm.partMode === 'existing'" (click)="contentForm.partMode = 'existing'">Existante</button>
+            <button [class.selected]="contentForm.partMode === 'new'" (click)="contentForm.partMode = 'new'">Nouvelle</button>
+          </div>
+
+          <select *ngIf="contentForm.partMode === 'existing'" [(ngModel)]="contentForm.selectedPart">
+            <option value="" disabled>Selectionner une partie</option>
+            <option *ngFor="let p of partsByChapter[(contentForm.courseMode === 'existing' ? contentForm.selectedCourse : contentForm.newCourse) + '|' + (contentForm.chapterMode === 'existing' ? contentForm.selectedChapter : contentForm.newChapter)] || []" [value]="p">{{ p }}</option>
+          </select>
+
+          <input *ngIf="contentForm.partMode === 'new'" [(ngModel)]="contentForm.newPart" placeholder="Nom de nouvelle partie" />
+        </div>
+
+        <div class="recap-box">
+          <strong>Récapitulatif :</strong><br>
+          Partie: {{ contentForm.partMode === 'existing' ? contentForm.selectedPart : contentForm.newPart || '(non choisie)' }}
+        </div>
+      </div>
+
+      <div *ngIf="currentStep === 3" class="step-block">
+        <p class="step-subtitle">Étape 3 sur 5 - Document de cours</p>
+        <div class="form-group">
+          <label>Document de cours (PDF, DOCX)</label>
+          <input type="file" accept=".pdf,.docx" (change)="handleDocumentInput($event)" />
+          <p class="file-name" *ngIf="contentForm.documentFileName">{{ contentForm.documentFileName }}</p>
+        </div>
+      </div>
+
+      <div *ngIf="currentStep === 4" class="step-block">
+        <p class="step-subtitle">Étape 4 sur 5 - Vidéo</p>
+        <div class="form-group">
+          <label>Vidéo (MP4, MOV, AVI, WebM)</label>
+          <input type="file" accept=".mp4,.mov,.avi,.webm,.mkv" (change)="handleVideoInput($event)" />
+          <p class="file-name" *ngIf="contentForm.videoFileName">{{ contentForm.videoFileName }}</p>
+        </div>
+        <div class="form-group">
+          <label>Lien vidéo (YouTube, Vimeo...)</label>
+          <input type="url" [(ngModel)]="contentForm.videoLink" placeholder="https://www.youtube.com/watch?v=..." />
+        </div>
+      </div>
+
+      <div *ngIf="currentStep === 5" class="step-block">
+        <p class="step-subtitle">Étape 5 sur 5 - Configuration du Quiz</p>
+        <div class="form-group">
+          <label>Type de quiz</label>
+          <div class="radio-group">
+            <button
+              type="button"
+              [class.selected]="contentForm.quizMode === 'existing'"
+              (click)="contentForm.quizMode = 'existing'"
+            >
+              Quiz existant
+            </button>
+            <button
+              type="button"
+              [class.selected]="contentForm.quizMode === 'generated'"
+              (click)="contentForm.quizMode = 'generated'"
+            >
+              Génération automatique
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Titre du quiz</label>
+          <input type="text" [(ngModel)]="contentForm.quizTitle" placeholder="Ex: Quiz - Jointures SQL" />
+        </div>
+
+        <div class="form-group">
+          <label>Description du quiz</label>
+          <textarea [(ngModel)]="contentForm.quizDescription" placeholder="Décrivez les objectifs d'évaluation de ce quiz"></textarea>
+        </div>
+
+        <div *ngIf="contentForm.quizMode === 'existing'" class="form-group">
+          <label>Fichier du quiz (PDF ou Word)</label>
+          <input type="file" accept=".pdf,.doc,.docx" (change)="handleQuizInput($event)" />
+          <p class="file-name" *ngIf="contentForm.quizFileName">{{ contentForm.quizFileName }}</p>
+          <small class="hint">
+            Le fichier sera disponible sur la plateforme et un quiz interactif sera aussi créé pour les étudiants.
+          </small>
+        </div>
+
+        <div *ngIf="contentForm.quizMode === 'existing'" class="form-group">
+          <label>Niveau de difficulté</label>
+          <select [(ngModel)]="contentForm.quizDifficulty">
+            <option value="facile">Facile</option>
+            <option value="moyen">Moyen</option>
+            <option value="difficile">Difficile</option>
+          </select>
+        </div>
+
+        <div *ngIf="contentForm.quizMode === 'generated'" class="grid-2">
+          <div class="form-group">
+            <label>Mots-clés pour la génération</label>
+            <textarea
+              [(ngModel)]="contentForm.quizKeywords"
+              placeholder="Ex: jointure, Inner Join, Left Join, Right Join, Full Join&#10;ou un mot-clÃ© par ligne"
+            ></textarea>
+            <small class="hint">
+              Séparez les mots-clés par des virgules pour générer automatiquement un QCM.
+            </small>
+          </div>
+          <div class="form-group">
+            <label>Niveau de difficulté</label>
+            <select [(ngModel)]="contentForm.quizDifficulty">
+              <option value="facile">Facile</option>
+              <option value="moyen">Moyen</option>
+              <option value="difficile">Difficile</option>
+            </select>
+          </div>
+        </div>
+
+        <div *ngIf="contentForm.quizMode === 'generated'" class="form-group">
+          <label>Chapitres sources pour la gÃ©nÃ©ration</label>
+          <input
+            type="file"
+            accept=".pdf,.doc,.docx"
+            multiple
+            (change)="handleQuizChapterInputs($event)"
+          />
+          <small class="hint">
+            Importez plusieurs chapitres. Le quiz sera gÃ©nÃ©rÃ© Ã  partir de tous les chapitres sÃ©lectionnÃ©s.
+          </small>
+          <div *ngIf="contentForm.quizChapterFileNames.length" class="recap-box">
+            <strong>Chapitres importÃ©s :</strong><br>
+            <span *ngFor="let fileName of contentForm.quizChapterFileNames; let isLast = last">
+              {{ fileName }}<span *ngIf="!isLast">, </span>
+            </span>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Nombre de questions</label>
+            <input type="number" [(ngModel)]="contentForm.quizQuestions" min="1" />
+          </div>
+          <div class="form-group">
+            <label>Tentatives max</label>
+            <input type="number" [(ngModel)]="contentForm.quizAttempts" min="1" />
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Score de réussite (%)</label>
+            <input type="number" [(ngModel)]="contentForm.quizScore" min="0" max="100" />
+          </div>
+          <div class="form-group">
+            <label>Date limite</label>
+            <input type="date" [(ngModel)]="contentForm.quizDueDate" />
+          </div>
+        </div>
+
+        <div class="recap-box">
+          <strong>Récapitulatif complet :</strong><br>
+          Cours: {{ contentForm.courseMode === 'existing' ? contentForm.selectedCourse : contentForm.newCourse }}<br>
+          Chapitre: {{ contentForm.chapterMode === 'existing' ? contentForm.selectedChapter : contentForm.newChapter }}<br>
+          Partie: {{ contentForm.partMode === 'existing' ? contentForm.selectedPart : contentForm.newPart }}<br>
+          Type de quiz: {{ contentForm.quizMode === 'existing' ? 'Quiz existant' : 'Quiz auto-généré' }}<br>
+          Niveau: {{ contentForm.quizDifficulty }}<br>
+          <ng-container *ngIf="contentForm.quizMode === 'generated'">
+            Mots-clés: {{ quizKeywordsList().join(', ') || '(aucun mot-clé)' }}<br>
+          </ng-container>
+          Contenu: Document ✓, Vidéo ✓, Quiz ✓
+        </div>
+      </div>
+
+      <div *ngIf="formError" class="error">{{ formError }}</div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="closeModal()">Annuler</button>
+      <button class="btn-outline" (click)="goBack()" [disabled]="currentStep === 1">Précédent</button>
+      <button class="btn-primary" *ngIf="currentStep < 5" (click)="goNext()">Suivant</button>
+      <button class="btn-primary" *ngIf="currentStep === 5" (click)="goNext()">
+        {{ editingCourseName ? 'Enregistrer les modifications' : 'Enregistrer la structure complète' }}
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+>>>>>>> mayarahachani

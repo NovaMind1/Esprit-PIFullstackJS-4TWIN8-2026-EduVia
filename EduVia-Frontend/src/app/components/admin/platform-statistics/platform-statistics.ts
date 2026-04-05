@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+<<<<<<< HEAD
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 
@@ -105,4 +106,15 @@ export class PlatformStatistics {
     this.selectedPeriod = period;
     this.isPeriodMenuOpen = false;
   }
+=======
+
+@Component({
+  selector: 'app-platform-statistics',
+  imports: [],
+  templateUrl: './platform-statistics.html',
+  styleUrl: './platform-statistics.css',
+})
+export class PlatformStatistics {
+
+>>>>>>> mayarahachani
 }

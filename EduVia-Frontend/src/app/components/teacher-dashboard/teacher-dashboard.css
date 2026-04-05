@@ -1,7 +1,12 @@
 .dashboard-container {
   min-height: 100vh;
+<<<<<<< HEAD
   background-color: #f8fafc;
   padding: 1.25rem;
+=======
+  background: #f8fbff;
+  padding: 2rem;
+>>>>>>> mayarahachani
   font-family: 'Roboto', 'Helvetica Neue', Arial, sans-serif;
 }
 
@@ -9,6 +14,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+<<<<<<< HEAD
   margin-bottom: 0.6rem;
   padding-bottom: 0.45rem;
   border-bottom: 1px solid #e5e7eb;
@@ -159,11 +165,48 @@ mat-drawer {
   width: 1rem;
   height: 1rem;
   font-size: 1rem;
+=======
+  margin-bottom: 1.75rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.dashboard-logo {
+  width: 64px;
+  height: auto;
+}
+
+.title-wrapper h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0;
+  color: #0f172a;
+}
+
+.prof-name {
+  font-size: 1rem;
+  color: #64748b;
+  margin: 0.25rem 0 0;
+}
+
+.logout-btn {
+  color: #d81b60;
+  border-color: rgba(216, 27, 96, 0.35);
+  border-radius: 999px;
+  padding-inline: 1rem;
+>>>>>>> mayarahachani
 }
 
 .custom-tab-group {
   ::ng-deep .mat-mdc-tab-header {
     margin-bottom: 1.5rem;
+<<<<<<< HEAD
   }
 
   ::ng-deep .mat-mdc-tab-labels {
@@ -184,6 +227,28 @@ mat-drawer {
     background-color: white;
     box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     color: #111827;
+=======
+    border-bottom: 1px solid #f3d2e0;
+  }
+
+  ::ng-deep .mat-mdc-tab-labels {
+    background: #eef2f7;
+    border-radius: 999px;
+    padding: 0.3rem;
+    width: fit-content;
+  }
+
+  ::ng-deep .mdc-tab {
+    min-width: 0;
+    padding: 0 0.8rem;
+  }
+
+  ::ng-deep .mdc-tab__text-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-weight: 600;
+>>>>>>> mayarahachani
   }
 }
 
@@ -194,11 +259,16 @@ mat-drawer {
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+<<<<<<< HEAD
   gap: 1.25rem;
+=======
+  gap: 1rem;
+>>>>>>> mayarahachani
   margin-bottom: 3rem;
 }
 
 .stat-card {
+<<<<<<< HEAD
   background: white;
   padding: 1.75rem 1.25rem;
   border-radius: 1rem;
@@ -228,10 +298,44 @@ mat-drawer {
 
 .stat-title {
   font-size: 0.95rem;
+=======
+  background: #fff;
+  min-height: 170px;
+  padding: 1.7rem 1.25rem;
+  border-radius: 1rem;
+  text-align: center;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+  border: 1px solid #edf2f7;
+}
+
+.stat-icon {
+  font-size: 2.2rem;
+  width: 2.2rem;
+  height: 2.2rem;
+  margin-bottom: 1rem;
+}
+
+.blue { color: #4f83ff; }
+.orange { color: #f97316; }
+.green { color: #20c997; }
+.yellow { color: #eab308; }
+
+.stat-number {
+  font-size: 3rem;
+  font-weight: 800;
+  line-height: 1;
+  color: #111827;
+  margin-bottom: 0.55rem;
+}
+
+.stat-title {
+  font-size: 0.98rem;
+>>>>>>> mayarahachani
   color: #6b7280;
 }
 
 .courses-section {
+<<<<<<< HEAD
   margin-top: 2.5rem;
 }
 
@@ -240,6 +344,16 @@ mat-drawer {
   font-weight: 700;
   color: #111827;
   margin: 0 0 1.25rem 0;
+=======
+  margin-top: 2.25rem;
+}
+
+.courses-section h2 {
+  margin: 0 0 1rem;
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: #0f172a;
+>>>>>>> mayarahachani
 }
 
 .courses-list {
@@ -248,6 +362,7 @@ mat-drawer {
   gap: 1rem;
 }
 
+<<<<<<< HEAD
 .course-item {
   display: flex;
   justify-content: space-between !important;
@@ -266,10 +381,44 @@ mat-drawer {
   flex-direction: column;
   align-items: flex-start;
   text-align: left;
+=======
+.empty-courses {
+  padding: 1.25rem;
+  border: 1px dashed #cbd5e1;
+  border-radius: 0.9rem;
+  background: #ffffff;
+  color: #64748b;
+  text-align: center;
+}
+
+.course-item {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  min-height: 120px;
+  width: 100%;
+  padding: 1.1rem 1.25rem;
+  border-radius: 0.9rem;
+  border: 1px solid #dde6ef;
+  background: #fff;
+  box-shadow: 0 1px 6px rgba(15, 23, 42, 0.04);
+  gap: 1rem;
+}
+
+.course-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  text-align: left;
+  flex: 1 1 auto;
+>>>>>>> mayarahachani
   min-width: 0;
 }
 
 .course-left h3 {
+<<<<<<< HEAD
   font-size: 1.25rem;
   font-weight: 600;
   color: #111827;
@@ -309,6 +458,103 @@ mat-drawer {
   background-color: #c026d3;
   color: white;
   border-color: #c026d3;
+=======
+  margin: 0 0 0.25rem;
+  color: #1f2937;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.course-subtitle {
+  margin: 0 0 0.4rem;
+  color: #6b7280;
+  font-size: 1rem;
+}
+
+.course-students {
+  margin: 0;
+  color: #475569;
+  font-size: 0.97rem;
+  font-weight: 600;
+}
+
+.voir-details {
+  min-width: 145px;
+  margin-left: auto;
+  border-radius: 999px;
+  border-color: rgba(216, 27, 96, 0.35);
+  color: #d81b60;
+  font-weight: 700;
+}
+
+.voir-details:hover {
+  background: #fff1f6;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.25rem;
+}
+
+.modal-box {
+  width: min(100%, 860px);
+  max-height: 90vh;
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 0.85rem;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.35);
+  border: 1px solid #d1d5db;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-body {
+  padding: 1rem 1.25rem;
+}
+
+.modal-footer {
+  padding: 1rem 1.25rem;
+  border-top: 1px solid #e5e7eb;
+  text-align: right;
+}
+
+.detail-list {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.detail-item {
+  padding: 0.9rem;
+  border-radius: 0.65rem;
+  border: 1px solid #e5e7eb;
+  background: #fafafa;
+}
+
+.detail-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.detail-type {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #6b7280;
+>>>>>>> mayarahachani
 }
 
 .dashboard-footer {
@@ -318,6 +564,7 @@ mat-drawer {
   font-size: 0.875rem;
 }
 
+<<<<<<< HEAD
 /* Responsive */
 @media (max-width: 768px) {
   .course-item {
@@ -348,4 +595,29 @@ mat-drawer {
 .profile-btn:hover {
   background-color: #f5f5f5;
 }
+=======
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 1rem;
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .header-left {
+    align-items: flex-start;
+  }
+
+  .course-item {
+    flex-direction: row !important;
+    align-items: center !important;
+  }
+
+  .voir-details {
+    width: auto;
+  }
+>>>>>>> mayarahachani
 }

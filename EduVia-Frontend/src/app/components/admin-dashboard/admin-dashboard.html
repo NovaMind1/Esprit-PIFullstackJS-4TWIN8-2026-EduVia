@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <div class="min-h-screen bg-gray-50">
   <!-- Header -->
   <header class="bg-white border-b px-6 py-4">
@@ -114,4 +115,23 @@
       </mat-tab>
     </mat-tab-group>
   </div>
+=======
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <h1>Tableau de Bord Administrateur</h1>
+    <button mat-raised-button color="warn" (click)="onLogout()">
+      <mat-icon>logout</mat-icon>
+      Déconnexion
+    </button>
+  </header>
+
+  <mat-tab-group>
+    <mat-tab label="Statistiques de la Plateforme">
+      <app-platform-statistics></app-platform-statistics>
+    </mat-tab>
+    <mat-tab label="Gestion des Utilisateurs">
+      <app-user-management></app-user-management>
+    </mat-tab>
+  </mat-tab-group>
+>>>>>>> mayarahachani
 </div>

@@ -1,11 +1,19 @@
 .role-selection-container {
   min-height: 100vh;
+<<<<<<< HEAD
   background: linear-gradient(135deg, #ffffff 0%, #fdf1f3 40%, #e7b8c1 100%);
+=======
+  background: #f8fafc;           /* fond très clair comme sur la capture */
+>>>>>>> mayarahachani
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 2rem 1rem;
+<<<<<<< HEAD
   font-family: 'Roboto', 'Helvetica Neue', sans-serif;
+=======
+  font-family: 'Roboto', 'Helvetica Neue', sans-serif; /* ou Inter si tu l'as */
+>>>>>>> mayarahachani
 }
 
 .main-content {
@@ -23,12 +31,21 @@
   justify-content: center;
   align-items: center;
   margin-bottom: 1.5rem;
+<<<<<<< HEAD
   height: 220px;
 }
 
 .logo-img {
   max-width: 220px;
   max-height: 220px;
+=======
+  height: 160px;
+}
+
+.logo-img {
+  max-width: 160px;
+  max-height: 160px;
+>>>>>>> mayarahachani
   width: auto;
   height: auto;
   object-fit: contain;
@@ -38,7 +55,11 @@
 .slogan {
   font-size: 1.125rem;
   font-weight: 500;
+<<<<<<< HEAD
   color: #4f46e5;
+=======
+  color: #4f46e5;               /* indigo */
+>>>>>>> mayarahachani
   margin-bottom: 0.5rem;
 }
 
@@ -68,14 +89,22 @@
   padding: 2.5rem 1.75rem;
   width: 100%;
   max-width: 380px;
+<<<<<<< HEAD
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+=======
+  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.08);
+>>>>>>> mayarahachani
   transition: transform 0.2s, box-shadow 0.2s;
   cursor: pointer;
 }
 
 .role-card:hover {
   transform: translateY(-6px);
+<<<<<<< HEAD
   box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.12);
+=======
+  box-shadow: 0 20px 35px -10px rgba(0,0,0,0.12);
+>>>>>>> mayarahachani
 }
 
 .icon-circle {
@@ -95,6 +124,7 @@
   color: white;
 }
 
+<<<<<<< HEAD
 .student-circle {
   background: #fee2e2;
 }
@@ -106,10 +136,21 @@
   border-radius: 0.9rem !important;
   padding: 0.75rem 2.5rem !important;
   font-weight: 700;
+=======
+.student-circle { background: #fee2e2; }     /* rose clair/rouge clair */
+
+.student-btn {
+  background-color: #dc2626 !important;     /* rouge vif */
+  color: white !important;
+  border-radius: 9999px !important;
+  padding: 0.75rem 2.5rem !important;
+  font-weight: 600;
+>>>>>>> mayarahachani
   text-transform: none;
   min-width: 180px;
 }
 
+<<<<<<< HEAD
 .teacher-circle {
   background: #dcfce7;
 }
@@ -121,10 +162,21 @@
   border-radius: 0.9rem !important;
   padding: 0.75rem 2.5rem !important;
   font-weight: 700;
+=======
+.teacher-circle { background: #dcfce7; }     /* vert clair */
+
+.teacher-btn {
+  background-color: #0f172a !important;     /* noir foncé / presque noir */
+  color: white !important;
+  border-radius: 9999px !important;
+  padding: 0.75rem 2.5rem !important;
+  font-weight: 600;
+>>>>>>> mayarahachani
   text-transform: none;
   min-width: 180px;
 }
 
+<<<<<<< HEAD
 .admin-circle {
   background: #f3e8ff;
 }
@@ -136,10 +188,21 @@
   border-radius: 0.9rem !important;
   padding: 0.75rem 2.5rem !important;
   font-weight: 700;
+=======
+.admin-circle { background: #f3e8ff; }       /* violet clair */
+
+.admin-btn {
+  background-color: #581c87 !important;     /* violet foncé */
+  color: white !important;
+  border-radius: 9999px !important;
+  padding: 0.75rem 2.5rem !important;
+  font-weight: 600;
+>>>>>>> mayarahachani
   text-transform: none;
   min-width: 180px;
 }
 
+<<<<<<< HEAD
 .student-btn:hover,
 .teacher-btn:hover,
 .admin-btn:hover {
@@ -147,6 +210,8 @@
   transform: translateY(-1px);
 }
 
+=======
+>>>>>>> mayarahachani
 .role-card h3 {
   font-size: 1.75rem;
   font-weight: 700;
@@ -159,4 +224,8 @@
   color: #4b5563;
   line-height: 1.5;
   margin-bottom: 2rem;
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> mayarahachani

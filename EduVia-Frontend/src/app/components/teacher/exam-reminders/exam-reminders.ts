@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+<<<<<<< HEAD
 
 @Component({
   selector: 'app-exam-reminders',
@@ -8,4 +9,24 @@ import { Component } from '@angular/core';
 })
 export class ExamReminders {
 
+=======
+import { CommonModule } from '@angular/common';
+
+@Component({
+  selector: 'app-exam-reminders',
+  imports: [CommonModule],
+  templateUrl: './exam-reminders.html',
+  styleUrl: './exam-reminders.css',
+})
+export class ExamReminders {
+  showModal = false;
+
+  openModal() {
+    this.showModal = true;
+  }
+
+  closeModal() {
+    this.showModal = false;
+  }
+>>>>>>> mayarahachani
 }

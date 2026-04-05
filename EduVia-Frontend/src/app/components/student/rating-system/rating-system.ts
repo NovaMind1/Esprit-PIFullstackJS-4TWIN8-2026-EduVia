@@ -5,10 +5,14 @@ import { Component } from '@angular/core';
   imports: [],
   templateUrl: './rating-system.html',
 <<<<<<< HEAD
+<<<<<<< HEAD
   styleUrls: ['./rating-system.css'],
 =======
   styleUrl: './rating-system.css',
 >>>>>>> souhail
+=======
+  styleUrl: './rating-system.css',
+>>>>>>> mayarahachani
 })
 export class RatingSystem {
 

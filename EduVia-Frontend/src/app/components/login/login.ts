@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { Component, Input, OnChanges, SimpleChanges, inject, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -21,10 +22,18 @@ import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 >>>>>>> souhail
+=======
+import { Component, Input, output } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+>>>>>>> mayarahachani
 
 @Component({
   selector: 'app-login',
   standalone: true,
+<<<<<<< HEAD
 <<<<<<< HEAD
   imports: [CommonModule, FormsModule, MatIconModule],
   templateUrl: './login.html',
@@ -489,17 +498,24 @@ export class Login implements OnChanges {
 
     return Array.from(indexes);
 =======
+=======
+>>>>>>> mayarahachani
   imports: [CommonModule, FormsModule, MatInputModule, MatButtonModule],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
 export class Login {
+<<<<<<< HEAD
   @Input() role: 'student' | null = 'student';
+=======
+  @Input() role: 'teacher' | null = null;
+>>>>>>> mayarahachani
   @Input() errorMessage: string | null = null;
 
   email = '';
   password = '';
 
+<<<<<<< HEAD
   login = output<{
     role: 'student' | null;
     email: string;
@@ -509,5 +525,11 @@ export class Login {
   onSubmit() {
     this.login.emit({ role: this.role, email: this.email, password: this.password });
 >>>>>>> souhail
+=======
+  login = output<{ role: 'teacher' | null; email: string; password: string }>();
+
+  onSubmit() {
+    this.login.emit({ role: this.role, email: this.email, password: this.password });
+>>>>>>> mayarahachani
   }
 }

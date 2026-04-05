@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { Component, OnInit, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -89,6 +90,8 @@ export class StudentDashboard implements OnInit {
   get userInitial(): string {
     return this.studentData.name.trim().charAt(0).toUpperCase() || 'E';
 =======
+=======
+>>>>>>> mayarahachani
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
@@ -283,13 +286,17 @@ export class StudentDashboard implements OnInit {
 
   setActiveTab(tabId: StudentTab) {
     this.activeTab = tabId;
+<<<<<<< HEAD
 >>>>>>> souhail
+=======
+>>>>>>> mayarahachani
   }
 
   onLogout() {
     this.logout.emit();
   }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
   toggleChatbot() {
     this.showChatbot = !this.showChatbot;
@@ -319,6 +326,8 @@ export class StudentDashboard implements OnInit {
     }
   }
 =======
+=======
+>>>>>>> mayarahachani
   startRecommendation(item: RecommendationItem) {
     if (item.type === 'Quiz') {
       this.selectedStandaloneQuizId = item.id;
@@ -878,5 +887,8 @@ export class StudentDashboard implements OnInit {
 
     return teachers[index % teachers.length];
   }
+<<<<<<< HEAD
 >>>>>>> souhail
+=======
+>>>>>>> mayarahachani
 }
