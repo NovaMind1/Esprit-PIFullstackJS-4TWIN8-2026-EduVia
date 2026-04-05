@@ -1,0 +1,172 @@
+.dashboard-container {
+  padding: 0.85rem;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.7rem;
+}
+
+.header-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.7rem;
+}
+
+.header-topline {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.brand-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.18rem;
+}
+
+.brand-copy h1 {
+  margin: 0;
+  color: #111827;
+  font-size: 1.85rem;
+  line-height: 1.1;
+}
+
+.brand-copy p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.95rem;
+  line-height: 1.3;
+}
+
+.logo-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.dashboard-logo {
+  width: 64px;
+  height: auto;
+}
+
+.header-userline {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-width: 0;
+}
+
+.user-avatar-block {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+}
+
+.user-avatar-image,
+.user-avatar-fallback {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+}
+
+.user-avatar-image {
+  object-fit: cover;
+  border: 2px solid #e7e9f1;
+}
+
+.user-avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f6dfe4;
+  color: #c8183c;
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.user-info h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.user-info p {
+  margin: 0.15rem 0 0;
+  color: #6b7280;
+  font-size: 0.92rem;
+  white-space: nowrap;
+}
+
+.header-right {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.logout-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  min-height: 2.5rem;
+  padding: 0.6rem 0.95rem;
+  border: 1px solid #f2c6ce;
+  border-radius: 0.9rem;
+  background: #fff5f7;
+  color: #c0395a;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease, background-color 160ms ease, color 160ms ease;
+}
+
+.logout-btn:hover {
+  border-color: #e3909f;
+  background: #fff0f3;
+  box-shadow: 0 14px 28px rgba(192, 57, 90, 0.12);
+  transform: translateY(-1px);
+}
+
+.logout-btn mat-icon {
+  width: 1rem;
+  height: 1rem;
+  font-size: 1rem;
+}
+
+.progress-card, .notifications-card {
+  margin-bottom: 1rem;
+}
+
+.tab-content {
+  padding: 1rem 0;
+}
+
+.course-card {
+  margin-bottom: 1rem;
+}
+
+.notification {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.exam-icon {
+  color: #dc2626;
+}
+
+.motivation-icon {
+  color: #10b981;
+}
+
+.chatbot-overlay {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 1000;
+}

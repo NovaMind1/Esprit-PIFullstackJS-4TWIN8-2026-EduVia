@@ -1,0 +1,39 @@
+/* You can add global styles to this file, and also import other style files */
+
+/* Global reset and base typography for role selection and overall app */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f8f8f8;
+  color: #333;
+}
+
+.mat-mdc-snack-bar-container.success-snackbar {
+  --mdc-snackbar-container-color: transparent;
+  --mdc-snackbar-supporting-text-color: #fff8fa;
+  --mat-mdc-snack-bar-button-color: #fff1f5;
+}
+
+.mat-mdc-snack-bar-container.success-snackbar .mdc-snackbar__surface {
+  min-height: 3.2rem;
+  padding: 1rem 1.2rem 1rem 1.35rem;
+  border-radius: 1rem;
+  background: linear-gradient(135deg, #7f1d35 0%, #a61d31 52%, #d14a61 100%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 18px 40px rgba(127, 29, 53, 0.28);
+  backdrop-filter: blur(10px);
+}
+
+.mat-mdc-snack-bar-container.success-snackbar .mdc-snackbar__label {
+  font-weight: 700;
+  color: #fff8fa;
+}
+
+.mat-mdc-snack-bar-container.success-snackbar .mdc-button__label {
+  font-weight: 800;
+}
