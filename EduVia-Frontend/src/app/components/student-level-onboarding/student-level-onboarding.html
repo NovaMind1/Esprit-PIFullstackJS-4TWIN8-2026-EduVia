@@ -53,6 +53,13 @@
         <button type="button" class="primary-action" (click)="startAssessment()">
           {{ existingResult ? 'Refaire mon test de niveau' : 'Check your level' }}
         </button>
+        <button type="button" class="secondary-action" (click)="toggleAccessibilityMode()">
+          {{
+            accessibilityMode
+              ? 'Desactiver le lecteur vocal'
+              : 'Activer le lecteur vocal pour etudiant non-voyant'
+          }}
+        </button>
         <button
           *ngIf="existingResult"
           type="button"
@@ -62,6 +69,12 @@
           Continuer avec mon niveau actuel
         </button>
         <button type="button" class="text-action" (click)="logout.emit()">Retour au login</button>
+      </div>
+
+      <div class="embedded-message accessibility-welcome-note" *ngIf="accessibilityMode">
+        Le mode accessibilite est actif. EduVia lira chaque question et chaque reponse. Pour
+        choisir une reponse, il suffit d'appuyer sur n'importe quelle touche du clavier autant de
+        fois que le numero de la reponse.
       </div>
     </div>
   </div>
@@ -86,6 +99,57 @@
         <h2>Evaluation intelligente de votre niveau</h2>
         <p>Repondez a chaque question pour que l'IA adapte le contenu a vos besoins.</p>
       </div>
+    </div>
+
+    <div class="accessibility-panel">
+      <div class="accessibility-panel__text">
+        <strong>Mode accessibilite</strong>
+        <p>
+          Lecteur vocal du test de niveau pour les etudiants non-voyants. Le systeme lit la
+          question et ses reponses, puis le choix se fait au clavier.
+        </p>
+      </div>
+
+      <div class="accessibility-panel__actions">
+        <button type="button" class="secondary-action" (click)="toggleAccessibilityMode()">
+          {{ accessibilityMode ? 'Desactiver le lecteur vocal' : 'Activer le lecteur vocal' }}
+        </button>
+        <button
+          *ngIf="accessibilityMode"
+          type="button"
+          class="secondary-action"
+          (click)="replayCurrentQuestion()"
+        >
+          Relire la question
+        </button>
+        <button
+          *ngIf="accessibilityMode"
+          type="button"
+          class="text-action"
+          (click)="stopReader()"
+        >
+          Arreter la lecture
+        </button>
+      </div>
+    </div>
+
+    <div class="accessibility-guide" *ngIf="accessibilityMode">
+      <div class="accessibility-guide__row">
+        <span class="subject-pill">Lecteur vocal actif</span>
+        <span>{{ keyPressCount }} pression(s) detectee(s)</span>
+      </div>
+      <p>
+        Exemple: 2 pressions sur n'importe quelle touche du clavier = reponse numero 2. Apres
+        8 secondes sans nouvelle pression, EduVia valide ce choix et passe automatiquement a la
+        question suivante.
+      </p>
+      <p class="accessibility-guide__status" *ngIf="accessibilityMessage">
+        {{ accessibilityMessage }}
+      </p>
+      <p class="form-error" *ngIf="!speechSupported">
+        Le navigateur ne fournit pas la lecture vocale automatique. Le choix clavier reste
+        disponible, mais le lecteur vocal doit etre teste sur un navigateur compatible.
+      </p>
     </div>
 
     <div class="embedded-message" *ngIf="loadingQuestions">

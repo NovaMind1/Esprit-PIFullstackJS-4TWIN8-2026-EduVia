@@ -1,6 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  HostListener,
+  Input,
+  OnChanges,
+  OnDestroy,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { catchError, of, timeout } from 'rxjs';
 import { LEVEL_ASSESSMENT_FALLBACK_QUESTIONS } from './student-level-questions';
@@ -68,7 +77,7 @@ export type LevelAssessmentResult = {
   templateUrl: './student-level-onboarding.html',
   styleUrl: './student-level-onboarding.css',
 })
-export class StudentLevelOnboarding implements OnChanges {
+export class StudentLevelOnboarding implements OnChanges, OnDestroy {
   @Input() studentEmail = '';
   @Input() existingResult: LevelAssessmentResult | null = null;
 
@@ -85,6 +94,12 @@ export class StudentLevelOnboarding implements OnChanges {
   errorMessage = '';
   activeResult: LevelAssessmentResult | null = null;
   syncMessage = '';
+  accessibilityMode = false;
+  accessibilityMessage = '';
+  keyPressCount = 0;
+
+  private keyboardSelectionTimer: ReturnType<typeof setTimeout> | null = null;
+  private readonly keyboardValidationDelay = 8000;
 
   constructor(private http: HttpClient) {}
 
@@ -115,6 +130,10 @@ export class StudentLevelOnboarding implements OnChanges {
     return this.selectedAnswers[question.id] || null;
   }
 
+  get speechSupported() {
+    return typeof window !== 'undefined' && 'speechSynthesis' in window;
+  }
+
   get answeredCount() {
     return Object.keys(this.selectedAnswers).length;
   }
@@ -132,6 +151,11 @@ export class StudentLevelOnboarding implements OnChanges {
     return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
   }
 
+  ngOnDestroy(): void {
+    this.clearAccessibilitySelection();
+    this.stopSpeech();
+  }
+
   startAssessment() {
     this.errorMessage = '';
     this.syncMessage = '';
@@ -141,6 +165,8 @@ export class StudentLevelOnboarding implements OnChanges {
     this.selectedAnswers = {};
     this.questions = [...LEVEL_ASSESSMENT_FALLBACK_QUESTIONS] as unknown as LevelAssessmentQuestion[];
     this.loadingQuestions = false;
+    this.clearAccessibilitySelection();
+    this.readCurrentQuestionIfNeeded();
     this.http
       .get<{ totalQuestions: number; questions: LevelAssessmentQuestion[] }>(
         '/api/student/level-assessment/questions',
@@ -153,6 +179,7 @@ export class StudentLevelOnboarding implements OnChanges {
         next: payload => {
           if (payload?.questions?.length) {
             this.questions = payload.questions;
+            this.readCurrentQuestionIfNeeded();
           }
           this.loadingQuestions = false;
         },
@@ -173,12 +200,16 @@ export class StudentLevelOnboarding implements OnChanges {
       [question.id]: optionId,
     };
     this.errorMessage = '';
+    this.keyPressCount = 0;
+    this.accessibilityMessage = '';
   }
 
   goToPreviousQuestion() {
     if (this.currentQuestionIndex > 0) {
       this.currentQuestionIndex -= 1;
       this.errorMessage = '';
+      this.clearAccessibilitySelection();
+      this.readCurrentQuestionIfNeeded();
     }
   }
 
@@ -191,6 +222,8 @@ export class StudentLevelOnboarding implements OnChanges {
     if (this.currentQuestionIndex < this.questions.length - 1) {
       this.currentQuestionIndex += 1;
       this.errorMessage = '';
+      this.clearAccessibilitySelection();
+      this.readCurrentQuestionIfNeeded();
     }
   }
 
@@ -245,6 +278,8 @@ export class StudentLevelOnboarding implements OnChanges {
     if (this.existingResult) {
       this.activeResult = this.existingResult;
       this.syncMessage = 'Ton niveau est deja connu. Tu peux ouvrir tout le dashboard.';
+      this.clearAccessibilitySelection();
+      this.stopSpeech();
       this.continueToDashboard.emit();
     }
   }
@@ -254,11 +289,15 @@ export class StudentLevelOnboarding implements OnChanges {
       return;
     }
 
+    this.clearAccessibilitySelection();
+    this.stopSpeech();
     this.continueToDashboard.emit();
   }
 
   retakeAssessment() {
     this.activeResult = null;
+    this.clearAccessibilitySelection();
+    this.stopSpeech();
     this.startAssessment();
   }
 
@@ -267,6 +306,68 @@ export class StudentLevelOnboarding implements OnChanges {
     this.errorMessage = '';
     this.currentQuestionIndex = 0;
     this.selectedAnswers = {};
+    this.clearAccessibilitySelection();
+    this.stopSpeech();
+  }
+
+  toggleAccessibilityMode() {
+    this.accessibilityMode = !this.accessibilityMode;
+    this.clearAccessibilitySelection();
+
+    if (!this.accessibilityMode) {
+      this.accessibilityMessage = '';
+      this.stopSpeech();
+      return;
+    }
+
+    if (!this.speechSupported) {
+      this.accessibilityMessage =
+        "Le lecteur vocal n'est pas disponible sur ce navigateur. Le mode clavier reste actif.";
+      return;
+    }
+
+    this.accessibilityMessage =
+      'Mode accessibilite actif. Le lecteur vocal lit la question et les reponses.';
+    this.readCurrentQuestionIfNeeded();
+  }
+
+  replayCurrentQuestion() {
+    this.readCurrentQuestionIfNeeded(true);
+  }
+
+  stopReader() {
+    this.stopSpeech();
+    this.accessibilityMessage = 'Lecture vocale arretee. Vous pouvez relancer la lecture quand vous voulez.';
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  handleKeyboardAnswer(event: KeyboardEvent) {
+    if (!this.accessibilityMode || this.mode !== 'quiz' || this.loadingQuestions || !this.currentQuestion) {
+      return;
+    }
+
+    if (event.repeat || this.isIgnoredKey(event)) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    this.keyPressCount += 1;
+
+    if (this.keyPressCount > this.currentQuestion.options.length) {
+      this.accessibilityMessage =
+        `Le nombre de pressions depasse ${this.currentQuestion.options.length}. Recommencez la selection pour cette question.`;
+      this.keyPressCount = 0;
+      this.resetKeyboardSelectionTimer();
+      this.readCurrentQuestionIfNeeded();
+      return;
+    }
+
+    this.accessibilityMessage =
+      `${this.keyPressCount} pression(s) detectee(s). EduVia selectionnera la reponse ${this.keyPressCount} dans 8 secondes si vous n'appuyez plus.`;
+    this.announceKeySelection();
+    this.resetKeyboardSelectionTimer();
   }
 
   resultTone(level: StudentLevel | undefined) {
@@ -356,5 +457,130 @@ export class StudentLevelOnboarding implements OnChanges {
       subjectBreakdown,
       completedAt: new Date().toISOString(),
     };
+  }
+
+  private completeKeyboardSelection() {
+    const question = this.currentQuestion;
+    if (!question || this.keyPressCount < 1) {
+      return;
+    }
+
+    const option = question.options[this.keyPressCount - 1];
+    if (!option) {
+      this.accessibilityMessage =
+        'Selection invalide. Relancez la lecture puis recommencez la selection au clavier.';
+      this.keyPressCount = 0;
+      return;
+    }
+
+    this.selectOption(option.id);
+    this.accessibilityMessage =
+      `Reponse ${this.keyPressCount} selectionnee. Passage automatique ${
+        this.currentQuestionIndex === this.questions.length - 1
+          ? 'vers le resultat'
+          : 'a la question suivante'
+      }.`;
+
+    const selectionCount = this.keyPressCount;
+    this.keyPressCount = 0;
+    this.stopSpeech();
+
+    const transitionSpeech = `Reponse ${selectionCount} enregistree. ${
+      this.currentQuestionIndex === this.questions.length - 1
+        ? 'Analyse du niveau en cours.'
+        : 'Question suivante.'
+    }`;
+    this.speakText(transitionSpeech);
+
+    if (this.currentQuestionIndex === this.questions.length - 1) {
+      this.submitAssessment();
+      return;
+    }
+
+    this.currentQuestionIndex += 1;
+    this.readCurrentQuestionIfNeeded();
+  }
+
+  private readCurrentQuestionIfNeeded(force = false) {
+    if (this.mode !== 'quiz' || !this.currentQuestion || !this.accessibilityMode) {
+      return;
+    }
+
+    if (!force && !this.speechSupported) {
+      return;
+    }
+
+    const narration = this.buildQuestionNarration(this.currentQuestion);
+    this.speakText(narration);
+  }
+
+  private buildQuestionNarration(question: LevelAssessmentQuestion) {
+    const options = question.options
+      .map((option, index) => `Reponse ${index + 1}. ${option.label}.`)
+      .join(' ');
+
+    return [
+      `Question ${this.currentQuestionIndex + 1} sur ${this.questions.length}.`,
+      `Matiere ${question.subject}.`,
+      question.prompt,
+      question.hint,
+      options,
+      "Pour choisir une reponse, appuyez sur n'importe quelle touche du clavier autant de fois que le numero correspondant a votre choix.",
+      'Apres 8 secondes sans nouvelle pression, EduVia validera ce choix et passera automatiquement a la suite.',
+    ].join(' ');
+  }
+
+  private announceKeySelection() {
+    if (!this.accessibilityMode) {
+      return;
+    }
+
+    this.speakText(
+      `${this.keyPressCount} pression${this.keyPressCount > 1 ? 's' : ''} detectee${
+        this.keyPressCount > 1 ? 's' : ''
+      }. EduVia attend 8 secondes pour valider la reponse ${this.keyPressCount}.`,
+    );
+  }
+
+  private resetKeyboardSelectionTimer() {
+    if (this.keyboardSelectionTimer) {
+      clearTimeout(this.keyboardSelectionTimer);
+    }
+
+    this.keyboardSelectionTimer = setTimeout(() => {
+      this.completeKeyboardSelection();
+    }, this.keyboardValidationDelay);
+  }
+
+  private clearAccessibilitySelection() {
+    if (this.keyboardSelectionTimer) {
+      clearTimeout(this.keyboardSelectionTimer);
+      this.keyboardSelectionTimer = null;
+    }
+
+    this.keyPressCount = 0;
+  }
+
+  private speakText(text: string) {
+    if (!this.speechSupported) {
+      return;
+    }
+
+    this.stopSpeech();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'fr-FR';
+    utterance.rate = 0.95;
+    utterance.pitch = 1;
+    window.speechSynthesis.speak(utterance);
+  }
+
+  private stopSpeech() {
+    if (this.speechSupported) {
+      window.speechSynthesis.cancel();
+    }
+  }
+
+  private isIgnoredKey(event: KeyboardEvent) {
+    return ['Shift', 'Control', 'Alt', 'Meta', 'CapsLock', 'Tab'].includes(event.key);
   }
 }
