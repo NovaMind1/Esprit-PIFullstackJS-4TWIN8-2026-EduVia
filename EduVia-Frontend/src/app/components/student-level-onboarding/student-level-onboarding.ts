@@ -99,6 +99,7 @@ export class StudentLevelOnboarding implements OnChanges, OnDestroy {
   keyPressCount = 0;
 
   private keyboardSelectionTimer: ReturnType<typeof setTimeout> | null = null;
+  private answerAdvanceTimer: ReturnType<typeof setTimeout> | null = null;
   private readonly keyboardValidationDelay = 8000;
 
   constructor(private http: HttpClient) {}
@@ -189,7 +190,7 @@ export class StudentLevelOnboarding implements OnChanges, OnDestroy {
       });
   }
 
-  selectOption(optionId: string) {
+  selectOption(optionId: string, scheduleAutoAdvance = true) {
     const question = this.currentQuestion;
     if (!question) {
       return;
@@ -202,6 +203,13 @@ export class StudentLevelOnboarding implements OnChanges, OnDestroy {
     this.errorMessage = '';
     this.keyPressCount = 0;
     this.accessibilityMessage = '';
+
+    if (this.accessibilityMode && scheduleAutoAdvance) {
+      const selectedOption = question.options.find(option => option.id === optionId);
+      this.scheduleAnswerAdvance(
+        `Reponse selectionnee: ${selectedOption?.label || 'option choisie'}. Passage automatique a la question suivante dans 8 secondes.`,
+      );
+    }
   }
 
   goToPreviousQuestion() {
@@ -473,7 +481,7 @@ export class StudentLevelOnboarding implements OnChanges, OnDestroy {
       return;
     }
 
-    this.selectOption(option.id);
+    this.selectOption(option.id, false);
     this.accessibilityMessage =
       `Reponse ${this.keyPressCount} selectionnee. Passage automatique ${
         this.currentQuestionIndex === this.questions.length - 1
@@ -558,7 +566,46 @@ export class StudentLevelOnboarding implements OnChanges, OnDestroy {
       this.keyboardSelectionTimer = null;
     }
 
+    if (this.answerAdvanceTimer) {
+      clearTimeout(this.answerAdvanceTimer);
+      this.answerAdvanceTimer = null;
+    }
+
     this.keyPressCount = 0;
+  }
+
+  private scheduleAnswerAdvance(message: string) {
+    if (!this.accessibilityMode || !this.currentQuestion) {
+      return;
+    }
+
+    if (this.answerAdvanceTimer) {
+      clearTimeout(this.answerAdvanceTimer);
+    }
+
+    this.accessibilityMessage = message;
+    this.answerAdvanceTimer = setTimeout(() => {
+      this.moveToNextQuestionAfterAccessibilitySelection();
+    }, this.keyboardValidationDelay);
+  }
+
+  private moveToNextQuestionAfterAccessibilitySelection() {
+    if (!this.accessibilityMode || !this.currentQuestion || !this.currentAnswer) {
+      return;
+    }
+
+    this.answerAdvanceTimer = null;
+    this.stopSpeech();
+
+    if (this.currentQuestionIndex === this.questions.length - 1) {
+      this.accessibilityMessage = 'Derniere reponse enregistree. Analyse du niveau en cours.';
+      this.submitAssessment();
+      return;
+    }
+
+    this.accessibilityMessage = 'Reponse validee. Question suivante.';
+    this.currentQuestionIndex += 1;
+    this.readCurrentQuestionIfNeeded();
   }
 
   private speakText(text: string) {
