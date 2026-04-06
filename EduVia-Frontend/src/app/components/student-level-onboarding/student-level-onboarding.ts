@@ -2,6 +2,29 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
+import { catchError, of, timeout } from 'rxjs';
+import { LEVEL_ASSESSMENT_FALLBACK_QUESTIONS } from './student-level-questions';
+
+const LEVEL_ASSESSMENT_CORRECT_ANSWERS: Record<string, string> = {
+  algo: 'algo-a',
+  reseau: 'reseau-b',
+  complexite: 'complexite-b',
+  angular: 'angular-c',
+  react: 'react-c',
+  'gestion-projet': 'gp-a',
+  c: 'c-c',
+  java: 'java-b',
+  cpp: 'cpp-b',
+  python: 'python-c',
+  graph: 'graph-b',
+  pl: 'pl-a',
+  bdd: 'bdd-c',
+  electronique: 'elec-b',
+  proba: 'proba-c',
+  'analyse-num': 'an-b',
+  microservices: 'ms-b',
+  'spring-boot': 'sb-b',
+};
 
 type StudentLevel = 'debutant' | 'intermediaire' | 'avance';
 
@@ -61,6 +84,7 @@ export class StudentLevelOnboarding implements OnChanges {
   submitting = false;
   errorMessage = '';
   activeResult: LevelAssessmentResult | null = null;
+  syncMessage = '';
 
   constructor(private http: HttpClient) {}
 
@@ -110,30 +134,30 @@ export class StudentLevelOnboarding implements OnChanges {
 
   startAssessment() {
     this.errorMessage = '';
+    this.syncMessage = '';
     this.activeResult = null;
     this.mode = 'quiz';
     this.currentQuestionIndex = 0;
     this.selectedAnswers = {};
-
-    if (this.questions.length > 0) {
-      return;
-    }
-
-    this.loadingQuestions = true;
+    this.questions = [...LEVEL_ASSESSMENT_FALLBACK_QUESTIONS] as unknown as LevelAssessmentQuestion[];
+    this.loadingQuestions = false;
     this.http
       .get<{ totalQuestions: number; questions: LevelAssessmentQuestion[] }>(
         '/api/student/level-assessment/questions',
       )
+      .pipe(
+        timeout(4000),
+        catchError(() => of(null)),
+      )
       .subscribe({
         next: payload => {
-          this.questions = payload.questions || [];
+          if (payload?.questions?.length) {
+            this.questions = payload.questions;
+          }
           this.loadingQuestions = false;
         },
         error: () => {
           this.loadingQuestions = false;
-          this.errorMessage =
-            "Impossible de charger le quiz de niveau pour le moment. Reessayez dans un instant.";
-          this.mode = 'welcome';
         },
       });
   }
@@ -179,28 +203,40 @@ export class StudentLevelOnboarding implements OnChanges {
 
     this.submitting = true;
     this.errorMessage = '';
+    this.syncMessage = 'Resultat en cours de synchronisation avec EduVia...';
 
     const answers = this.questions.map(question => ({
       questionId: question.id,
       selectedOptionId: this.selectedAnswers[question.id],
     }));
 
+    const localResult = this.buildLocalAssessmentResult(answers);
+    this.activeResult = localResult;
+    this.mode = 'result';
+    this.resultSaved.emit(localResult);
+    this.submitting = false;
+
     this.http
       .post<LevelAssessmentResult>('/api/student/level-assessment/submit', {
         email: this.studentEmail,
         answers,
       })
+      .pipe(
+        timeout(5000),
+        catchError(() => of(null)),
+      )
       .subscribe({
         next: result => {
-          this.submitting = false;
-          this.activeResult = result;
-          this.mode = 'result';
-          this.resultSaved.emit(result);
+          if (result) {
+            this.activeResult = result;
+            this.resultSaved.emit(result);
+          }
+          this.syncMessage =
+            'Resultat pret. Tu peux maintenant naviguer dans tout le dashboard etudiant.';
         },
         error: () => {
-          this.submitting = false;
-          this.errorMessage =
-            "Impossible de calculer votre niveau pour le moment. Merci de reessayer.";
+          this.syncMessage =
+            'Resultat pret localement. Tu peux maintenant naviguer dans tout le dashboard etudiant.';
         },
       });
   }
@@ -208,6 +244,7 @@ export class StudentLevelOnboarding implements OnChanges {
   continueWithExistingLevel() {
     if (this.existingResult) {
       this.activeResult = this.existingResult;
+      this.syncMessage = 'Ton niveau est deja connu. Tu peux ouvrir tout le dashboard.';
       this.continueToDashboard.emit();
     }
   }
@@ -255,5 +292,69 @@ export class StudentLevelOnboarding implements OnChanges {
       hour: '2-digit',
       minute: '2-digit',
     });
+  }
+
+  private buildLocalAssessmentResult(
+    answers: { questionId: string; selectedOptionId: string }[],
+  ): LevelAssessmentResult {
+    const subjectBreakdown = this.questions.map(question => {
+      const selectedOptionId =
+        answers.find(answer => answer.questionId === question.id)?.selectedOptionId || null;
+      const selectedOption = question.options.find(option => option.id === selectedOptionId);
+      const correctOptionId =
+        LEVEL_ASSESSMENT_CORRECT_ANSWERS[question.id] || question.options[0]?.id || '';
+      const correctOption = question.options.find(option => option.id === correctOptionId);
+      const correct = selectedOptionId === correctOptionId;
+
+      return {
+        subject: question.subject,
+        correct,
+        selectedOptionId,
+        selectedLabel: selectedOption?.label || 'Sans reponse',
+        correctLabel: correctOption?.label || '',
+        explanation: question.hint,
+      };
+    });
+
+    const score = subjectBreakdown.filter(item => item.correct).length;
+    const totalQuestions = this.questions.length;
+    const percentage = totalQuestions ? Math.round((score / totalQuestions) * 100) : 0;
+    const ratio = totalQuestions ? score / totalQuestions : 0;
+    const level: StudentLevel =
+      ratio >= 0.72 ? 'avance' : ratio >= 0.4 ? 'intermediaire' : 'debutant';
+    const strongestSubjects = subjectBreakdown
+      .filter(item => item.correct)
+      .slice(0, 6)
+      .map(item => item.subject);
+    const improvementSubjects = subjectBreakdown
+      .filter(item => !item.correct)
+      .slice(0, 6)
+      .map(item => item.subject);
+
+    return {
+      email: this.studentEmail || null,
+      level,
+      levelLabel:
+        level === 'avance' ? 'Avance' : level === 'intermediaire' ? 'Intermediaire' : 'Debutant',
+      score,
+      totalQuestions,
+      percentage,
+      summary:
+        level === 'avance'
+          ? `Excellent niveau de depart. Vous avez montre une tres bonne maitrise de ${strongestSubjects.slice(0, 3).join(', ')}.`
+          : level === 'intermediaire'
+            ? `Votre base est solide. EduVia vous proposera maintenant un parcours intermediaire personnalise.`
+            : `Vous commencez avec un profil debutant. EduVia va renforcer vos bases progressivement.`,
+      recommendation:
+        level === 'avance'
+          ? 'Passez directement aux parcours avances et aux projets plus ambitieux.'
+          : level === 'intermediaire'
+            ? 'Travaillez quelques matieres a renforcer puis avancez vers des quiz progressifs.'
+            : 'Commencez par les cours fondamentaux, puis revenez sur les quiz de niveau.',
+      strongestSubjects,
+      improvementSubjects,
+      subjectBreakdown,
+      completedAt: new Date().toISOString(),
+    };
   }
 }

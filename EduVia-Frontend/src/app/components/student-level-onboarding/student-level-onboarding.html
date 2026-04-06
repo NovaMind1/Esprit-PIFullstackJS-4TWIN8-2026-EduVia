@@ -170,6 +170,7 @@
 
     <p class="result-summary">{{ result.summary }}</p>
     <p class="result-recommendation">{{ result.recommendation }}</p>
+    <p class="embedded-message" *ngIf="syncMessage">{{ syncMessage }}</p>
 
     <div class="result-grid">
       <div class="result-panel">
@@ -214,7 +215,7 @@
         Refaire le test
       </button>
       <button type="button" class="primary-action" (click)="continueAfterResult()">
-        Acceder a mon espace etudiant
+        Acceder a tout mon dashboard etudiant
       </button>
     </div>
   </div>
