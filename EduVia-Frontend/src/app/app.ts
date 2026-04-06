@@ -24,11 +24,11 @@ export class App {
     const normalizedEmail = (event.email || '').trim().toLowerCase();
     this.studentEmail.set(normalizedEmail);
     this.isLoggedIn.set(true);
-    this.isDashboardReady.set(false);
 
     const existing = this.restoreAssessmentResult(normalizedEmail);
     this.assessmentResult.set(existing);
     this.studentLevel.set(existing?.level || 'debutant');
+    this.isDashboardReady.set(!!existing);
   }
 
   onLogout() {
