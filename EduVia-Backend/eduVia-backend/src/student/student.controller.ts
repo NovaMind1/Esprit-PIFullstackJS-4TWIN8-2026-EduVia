@@ -34,6 +34,7 @@ export class StudentController {
       level?: string;
       courseId?: string;
       chapterId?: string;
+      history?: { role?: string; text?: string }[];
     },
   ) {
     return this.studentService.askAssistant(body);

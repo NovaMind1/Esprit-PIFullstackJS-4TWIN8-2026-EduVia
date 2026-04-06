@@ -456,6 +456,7 @@ export class StudentService {
     level?: string;
     courseId?: string;
     chapterId?: string;
+    history?: { role?: string; text?: string }[];
   }) {
     const question = (body.question || '').trim();
     if (!question) {
@@ -473,6 +474,12 @@ export class StudentService {
       .filter(item => !body.courseId || item.courseId === body.courseId)
       .filter(item => !body.chapterId || item.chapterId === body.chapterId)
       .slice(0, 20);
+    const localAnswer = this.buildLocalAssistantAnswer(
+      question,
+      visibleContents,
+      studentLevel,
+      relevantContents,
+    );
 
     const context = relevantContents
       .map(item => {
@@ -497,13 +504,19 @@ export class StudentService {
       "Si la question est un exercice, guide l'etudiant sans donner une reponse inutilement vague.",
       `Niveau de l'etudiant: ${studentLevel}.`,
       context ? `Contexte visible dans la plateforme:\n${context}` : '',
+      Array.isArray(body.history) && body.history.length > 0
+        ? `Historique recent:\n${body.history
+            .slice(-6)
+            .map(item => `- ${item.role || 'user'}: ${item.text || ''}`)
+            .join('\n')}`
+        : '',
     ]
       .filter(Boolean)
       .join('\n\n');
 
-    if (!apiKey) {
+    if (!apiKey || this.shouldPreferFastLocalAnswer(question, visibleContents)) {
       return {
-        answer: this.buildLocalAssistantAnswer(question, relevantContents, studentLevel),
+        answer: localAnswer,
       };
     }
 
@@ -528,7 +541,7 @@ export class StudentService {
             Authorization: `Bearer ${apiKey}`,
             'Content-Type': 'application/json',
           },
-          timeout: 20000,
+          timeout: 6500,
         },
       );
 
@@ -541,7 +554,7 @@ export class StudentService {
       return { answer };
     } catch (error: any) {
       return {
-        answer: this.buildLocalAssistantAnswer(question, relevantContents, studentLevel),
+        answer: localAnswer,
       };
     }
   }
@@ -550,28 +563,207 @@ export class StudentService {
     question: string,
     contents: StudentContent[],
     level: StudentLevel,
+    scopedContents: StudentContent[] = contents,
   ) {
     const normalizedQuestion = this.normalizeText(question);
-    const courseNames = Array.from(
-      new Set(contents.map(item => item.courseId).filter((item): item is string => !!item)),
+    const snapshot = this.buildAssistantSnapshot(contents, level);
+    const scopedChapterNames = Array.from(
+      new Set(scopedContents.map(item => item.chapterId).filter((item): item is string => !!item)),
     );
-    const chapterNames = Array.from(
-      new Set(contents.map(item => item.chapterId).filter((item): item is string => !!item)),
-    );
-
+    const matchedCourses = this.findMentionedNames(normalizedQuestion, snapshot.courseNames);
+    const matchedQuizzes = this.findMentionedNames(normalizedQuestion, snapshot.quizNames);
+    const levelAssessmentSubjects = LEVEL_ASSESSMENT_QUESTIONS.map(item => item.subject);
     const contextualHeader =
-      courseNames.length > 0
-        ? `Je me base sur vos cours visibles dans EduVia: ${courseNames.join(', ')}.`
-        : `Je vous reponds au niveau ${level}.`;
+      snapshot.courseNames.length > 0
+        ? `Je me base sur ${snapshot.courseNames.length} cours visibles dans EduVia: ${snapshot.courseNames.join(', ')}.`
+        : `Je vous reponds sur la plateforme EduVia au niveau ${snapshot.levelLabel.toLowerCase()}.`;
 
     if (
       normalizedQuestion.includes('bonjour') ||
       normalizedQuestion.includes('salut') ||
+      normalizedQuestion.includes('bonsoir') ||
       normalizedQuestion.includes("j'ai besoin d'aide") ||
       normalizedQuestion.includes("jai besoin d'aide") ||
       normalizedQuestion === 'aide'
     ) {
-      return `${contextualHeader} Dites-moi simplement la notion ou l'exercice qui vous bloque, par exemple: "c'est quoi une jointure ?", "explique if else", "donne-moi un exercice sur les boucles", ou "resume le chapitre 1".`;
+      return [
+        contextualHeader,
+        "Je peux repondre sur toute l'application EduVia: cours, quiz, test de niveau, communaute, clubs, assistant IA, parametres, dashboard enseignant et administration.",
+        'Posez-moi une question directe, par exemple: "Quels cours sont publies ?", "Comment fonctionne le test de niveau ?", "Que contient l onglet Communaute ?" ou "Le cours Angular est-il visible ?".',
+      ].join(' ');
+    }
+
+    if (
+      normalizedQuestion.includes('comment fonctionne eduvia') ||
+      normalizedQuestion.includes('comment marche eduvia') ||
+      normalizedQuestion.includes('comment fonctionne la plateforme') ||
+      normalizedQuestion.includes('que peut faire la plateforme') ||
+      normalizedQuestion.includes('cest quoi eduvia') ||
+      normalizedQuestion.includes("c'est quoi eduvia")
+    ) {
+      return [
+        "EduVia est une plateforme d'apprentissage qui relie l'espace etudiant, l'espace enseignant et la supervision administrateur.",
+        `Dans l'espace etudiant, vous trouvez les onglets ${snapshot.tabs.map(tab => tab.label).join(', ')}.`,
+        "L'enseignant publie les cours et les quiz. L'etudiant apprend, passe le test de niveau, suit ses cours, discute dans la communaute et utilise l'assistant IA. L'administrateur supervise les utilisateurs et les statistiques globales.",
+      ].join(' ');
+    }
+
+    if (
+      normalizedQuestion.includes('test de niveau') ||
+      normalizedQuestion.includes('check your level') ||
+      normalizedQuestion.includes('quiz de niveau') ||
+      normalizedQuestion.includes('niveau initial')
+    ) {
+      if (
+        normalizedQuestion.includes('matiere') ||
+        normalizedQuestion.includes('sujet') ||
+        normalizedQuestion.includes('question')
+      ) {
+        return [
+          `Le test de niveau EduVia couvre ${levelAssessmentSubjects.length} matieres: ${levelAssessmentSubjects.join(', ')}.`,
+          "Il s'affiche une seule fois pour un nouvel email, puis le niveau deja obtenu est reutilise aux connexions suivantes.",
+        ].join(' ');
+      }
+
+      return [
+        "Le test de niveau apparait a la premiere connexion d'un nouvel etudiant.",
+        `Il couvre ${levelAssessmentSubjects.length} matieres et calcule un niveau debutant, intermediaire ou avance selon les reponses.`,
+        "Une fois termine, l'etudiant accede a tout son dashboard et ne revoit plus ce test avec le meme email.",
+      ].join(' ');
+    }
+
+    if (
+      normalizedQuestion.includes('quels cours') ||
+      normalizedQuestion.includes('liste des cours') ||
+      normalizedQuestion.includes('cours publie') ||
+      normalizedQuestion.includes('cours disponible') ||
+      (normalizedQuestion.includes('combien') && normalizedQuestion.includes('cours'))
+    ) {
+      if (snapshot.courseNames.length === 0) {
+        return "Pour le moment, aucun cours n'est visible dans l'espace etudiant. Des qu'un enseignant publie du contenu relie a un cours, il apparaitra dans l'onglet Parcours.";
+      }
+
+      if (normalizedQuestion.includes('combien')) {
+        return `Vous avez actuellement ${snapshot.courseNames.length} cours visibles dans EduVia: ${snapshot.courseNames.join(', ')}.`;
+      }
+
+      return `Les cours visibles actuellement sont: ${snapshot.courseNames.join(', ')}.`;
+    }
+
+    if (
+      normalizedQuestion.includes('est publie') ||
+      normalizedQuestion.includes('est disponible') ||
+      normalizedQuestion.includes('est visible')
+    ) {
+      if (matchedCourses.length > 0) {
+        return `Oui, ${matchedCourses.join(', ')} ${matchedCourses.length > 1 ? 'sont visibles' : 'est visible'} dans l'espace etudiant EduVia.`;
+      }
+
+      if (normalizedQuestion.includes('cours')) {
+        return snapshot.courseNames.length > 0
+          ? `Je ne retrouve pas ce cours exact parmi les cours visibles. Pour le moment, je vois: ${snapshot.courseNames.join(', ')}.`
+          : "Je ne vois encore aucun cours visible dans l'espace etudiant pour verifier cette demande.";
+      }
+    }
+
+    if (
+      normalizedQuestion.includes('quiz') &&
+      (normalizedQuestion.includes('combien') ||
+        normalizedQuestion.includes('quel') ||
+        normalizedQuestion.includes('liste') ||
+        normalizedQuestion.includes('disponible') ||
+        normalizedQuestion.includes('pret'))
+    ) {
+      if (snapshot.quizNames.length === 0) {
+        return "Pour le moment, aucun quiz actif n'est visible dans l'espace etudiant. Les quiz apparaitront des qu'un enseignant publiera un quiz avec des questions actives.";
+      }
+
+      if (matchedQuizzes.length > 0) {
+        return `Oui, le quiz ${matchedQuizzes.join(', ')} est disponible dans EduVia.`;
+      }
+
+      if (normalizedQuestion.includes('combien')) {
+        return `Vous avez actuellement ${snapshot.quizNames.length} quiz visibles: ${snapshot.quizNames.join(', ')}.`;
+      }
+
+      return `Les quiz visibles actuellement sont: ${snapshot.quizNames.join(', ')}.`;
+    }
+
+    if (
+      normalizedQuestion.includes('parcours') ||
+      normalizedQuestion.includes('mes cours') ||
+      normalizedQuestion.includes('onglet parcours')
+    ) {
+      return [
+        "L'onglet Parcours permet de voir les cours disponibles, rechercher un cours, filtrer par niveau et ouvrir le detail d'un cours.",
+        "Depuis cette vue, l'etudiant peut lire les ressources, lancer les quiz et continuer son apprentissage.",
+      ].join(' ');
+    }
+
+    if (normalizedQuestion.includes('evaluation')) {
+      return "L'onglet Evaluation est reserve aux bilans intelligents de l'etudiant. Il accueille le test de niveau et les futures analyses pedagogiques.";
+    }
+
+    if (normalizedQuestion.includes('communaute') || normalizedQuestion.includes('forum')) {
+      return "L'onglet Communaute permet de publier une demande d'aide, consulter les questions des autres et ouvrir un chat prive pour s'entraider entre etudiants.";
+    }
+
+    if (normalizedQuestion.includes('club') || normalizedQuestion.includes('clubs')) {
+      return "L'onglet Clubs est prevu pour connecter l'etudiant a la vie campus, aux suggestions de clubs et, dans la plateforme complete, aux evenements et activites clubs.";
+    }
+
+    if (normalizedQuestion.includes('assistant') || normalizedQuestion.includes('chatbot')) {
+      return "L'onglet Assistant IA est votre aide intelligente EduVia. Il peut repondre sur les cours, les quiz, le test de niveau, la navigation dans l'application et les autres espaces de la plateforme.";
+    }
+
+    if (normalizedQuestion.includes('parametre') || normalizedQuestion.includes('settings')) {
+      return "L'onglet Parametres sert aux reglages personnels, au profil et au systeme de preferences de l'etudiant.";
+    }
+
+    if (
+      normalizedQuestion.includes('progression') ||
+      normalizedQuestion.includes('recommandation') ||
+      normalizedQuestion.includes('recommande')
+    ) {
+      return snapshot.courseNames.length > 0
+        ? `EduVia utilise les cours visibles comme ${snapshot.courseNames.slice(0, 3).join(', ')} pour guider la progression, proposer des recommandations et prioriser les prochains quiz.`
+        : "EduVia calcule la progression et les recommandations a partir des cours visibles, des quiz et du niveau etudiant. Elles apparaitront des que des contenus seront disponibles.";
+    }
+
+    if (
+      normalizedQuestion.includes('navigation') ||
+      normalizedQuestion.includes('naviguer') ||
+      normalizedQuestion.includes('ou aller') ||
+      normalizedQuestion.includes('avancer')
+    ) {
+      return "Dans l'espace etudiant, vous pouvez naviguer dans Parcours, Evaluation, Quiz, Communaute, Clubs, Assistant IA et Parametres. Le plus simple est de commencer par Parcours puis Quiz.";
+    }
+
+    if (
+      normalizedQuestion.includes('enseignant') &&
+      (normalizedQuestion.includes('que peut') ||
+        normalizedQuestion.includes('dashboard') ||
+        normalizedQuestion.includes('role'))
+    ) {
+      return "Le dashboard enseignant sert a publier les cours, organiser les ressources, creer les quiz et suivre les performances des etudiants.";
+    }
+
+    if (
+      normalizedQuestion.includes('admin') &&
+      (normalizedQuestion.includes('que peut') ||
+        normalizedQuestion.includes('dashboard') ||
+        normalizedQuestion.includes('role') ||
+        normalizedQuestion.includes('gerer'))
+    ) {
+      return "Le dashboard administrateur sert a superviser les utilisateurs, suivre les statistiques globales et coordonner les espaces etudiant, enseignant et administration.";
+    }
+
+    if (
+      normalizedQuestion.includes('connexion') ||
+      normalizedQuestion.includes('connecter') ||
+      normalizedQuestion.includes('login')
+    ) {
+      return "Apres connexion, un nouvel etudiant voit d'abord le test de niveau. Une fois le test valide, il accede a tout son dashboard. Lors des connexions suivantes avec le meme email, EduVia ouvre directement le dashboard.";
     }
 
     if (normalizedQuestion.includes('machine learning') || normalizedQuestion.includes('apprentissage automatique')) {
@@ -614,6 +806,29 @@ export class StudentService {
       ].join(' ');
     }
 
+    if (normalizedQuestion.includes('angular')) {
+      return [
+        "Angular est un framework frontend organise autour de composants, services, modules et injection de dependances.",
+        "On l'utilise pour construire des interfaces riches cote client.",
+        "Si vous voulez, je peux expliquer un composant, un service, un module ou les formulaires Angular pas a pas.",
+      ].join(' ');
+    }
+
+    if (normalizedQuestion.includes('react')) {
+      return [
+        "React est une bibliotheque frontend basee sur des composants reutilisables et un rendu declaratif.",
+        "Les hooks comme useState et useEffect servent a gerer l'etat et les effets.",
+        "Je peux aussi comparer React et Angular ou vous expliquer un hook en detail.",
+      ].join(' ');
+    }
+
+    if (normalizedQuestion.includes('reseau')) {
+      return [
+        "En reseaux, on etudie la communication entre machines, les protocoles comme TCP/IP, HTTP, DNS et HTTPS, ainsi que l'adressage et le routage.",
+        "Si vous voulez, je peux expliquer un protocole precis ou vous aider sur un exercice reseau.",
+      ].join(' ');
+    }
+
     if (normalizedQuestion.includes('exercice')) {
       return [
         `${contextualHeader} Voici une methode simple pour reussir un exercice:`,
@@ -627,16 +842,89 @@ export class StudentService {
 
     if (normalizedQuestion.includes('resume') || normalizedQuestion.includes('resumer') || normalizedQuestion.includes('chapitre')) {
       const chaptersText =
-        chapterNames.length > 0 ? `Chapitres visibles: ${chapterNames.join(', ')}.` : '';
+        scopedChapterNames.length > 0 ? `Chapitres visibles: ${scopedChapterNames.join(', ')}.` : '';
       return `${contextualHeader} ${chaptersText} Donnez-moi le nom du chapitre ou copiez un passage, et je vous ferai un resume clair, court et adapte a votre niveau.`;
     }
 
     return [
       contextualHeader,
-      "Je peux vous aider sur les definitions, les exercices, les quiz, SQL, algorithmique, machine learning, mathematiques et autres matieres.",
-      "Ecrivez votre question de facon un peu plus precise et je vous repondrai clairement.",
-      `Exemple: "explique la difference entre INNER JOIN et LEFT JOIN" ou "donne-moi un exercice sur ${courseNames[0] || 'ce cours'}".`,
+      "Je peux repondre sur toute la plateforme EduVia: cours, quiz, test de niveau, communaute, clubs, assistant, parametres, dashboard enseignant et administration.",
+      "Je peux aussi expliquer une notion de cours ou vous guider sur un exercice.",
+      `Exemple: "Quels cours sont publies ?", "Comment fonctionne le test de niveau ?" ou "donne-moi un exercice sur ${snapshot.courseNames[0] || 'algorithmique'}".`,
     ].join(' ');
+  }
+
+  private shouldPreferFastLocalAnswer(question: string, contents: StudentContent[]) {
+    const normalizedQuestion = this.normalizeText(question);
+
+    if (
+      normalizedQuestion.includes('eduvia') ||
+      normalizedQuestion.includes('plateforme') ||
+      normalizedQuestion.includes('dashboard') ||
+      normalizedQuestion.includes('cours') ||
+      normalizedQuestion.includes('quiz') ||
+      normalizedQuestion.includes('communaute') ||
+      normalizedQuestion.includes('forum') ||
+      normalizedQuestion.includes('club') ||
+      normalizedQuestion.includes('assistant') ||
+      normalizedQuestion.includes('chatbot') ||
+      normalizedQuestion.includes('parametre') ||
+      normalizedQuestion.includes('admin') ||
+      normalizedQuestion.includes('enseignant') ||
+      normalizedQuestion.includes('progression') ||
+      normalizedQuestion.includes('recommandation') ||
+      normalizedQuestion.includes('navigation') ||
+      normalizedQuestion.includes('avancer') ||
+      normalizedQuestion.includes('niveau') ||
+      normalizedQuestion.includes('check your level') ||
+      normalizedQuestion.includes('bonjour') ||
+      normalizedQuestion.includes('salut')
+    ) {
+      return true;
+    }
+
+    return contents.length === 0;
+  }
+
+  private buildAssistantSnapshot(contents: StudentContent[], level: StudentLevel) {
+    const courseNames = Array.from(
+      new Set(
+        contents
+          .map(item => item.courseId || (this.isCourse(item) ? item.title : ''))
+          .filter((item): item is string => !!item),
+      ),
+    ).sort((a, b) => a.localeCompare(b));
+    const quizNames = Array.from(
+      new Set(
+        contents
+          .filter(item => this.isQuiz(item))
+          .map(item => item.title)
+          .filter((item): item is string => !!item),
+      ),
+    ).sort((a, b) => a.localeCompare(b));
+
+    return {
+      level,
+      levelLabel: this.levelLabel(level),
+      courseNames,
+      quizNames,
+      tabs: [
+        { id: 'parcours', label: 'Parcours' },
+        { id: 'evaluation', label: 'Evaluation' },
+        { id: 'quiz', label: 'Quiz' },
+        { id: 'communaute', label: 'Communaute' },
+        { id: 'clubs', label: 'Clubs' },
+        { id: 'assistant', label: 'Assistant IA' },
+        { id: 'parametres', label: 'Parametres' },
+      ],
+    };
+  }
+
+  private findMentionedNames(question: string, names: string[]) {
+    return names.filter(name => {
+      const normalizedName = this.normalizeText(name);
+      return normalizedName.length > 2 && question.includes(normalizedName);
+    });
   }
 
   private normalizeText(value: string) {

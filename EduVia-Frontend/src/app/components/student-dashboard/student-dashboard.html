@@ -230,7 +230,7 @@
   </section>
 
   <section *ngIf="activeTab === 'assistant'" class="embedded-section assistant-panel">
-    <app-chatbot></app-chatbot>
+    <app-chatbot [studentLevel]="studentLevel"></app-chatbot>
   </section>
 
   <section *ngIf="activeTab === 'parametres'" class="embedded-section">

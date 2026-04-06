@@ -2,11 +2,11 @@
   <div class="ai-chat__intro">
     <div class="ai-chat__title-row">
       <div class="ai-chat__title-icon">
-        <span>💬</span>
+        <span>AI</span>
       </div>
       <div>
         <h2>Assistant d'apprentissage IA</h2>
-        <p>Posez vos questions et obtenez de l'aide personnalisee 24/7</p>
+        <p>Posez librement vos questions sur toute la plateforme EduVia</p>
       </div>
     </div>
   </div>
@@ -19,8 +19,8 @@
         [class.ai-message--student]="message.sender === 'student'"
       >
         <div class="ai-message__avatar">
-          <span *ngIf="message.sender === 'assistant'">🤖</span>
-          <span *ngIf="message.sender === 'student'">👤</span>
+          <span *ngIf="message.sender === 'assistant'">IA</span>
+          <span *ngIf="message.sender === 'student'">Moi</span>
         </div>
 
         <div class="ai-message__bubble">
@@ -28,6 +28,10 @@
           <span>{{ message.time }}</span>
         </div>
       </article>
+    </div>
+
+    <div class="ai-chat__status" *ngIf="pendingResponses > 0">
+      Reponse detaillee en cours de synchronisation...
     </div>
 
     <div class="ai-chat__quick">
@@ -41,11 +45,10 @@
         type="text"
         [(ngModel)]="draftMessage"
         (keydown.enter)="sendMessage()"
-        [disabled]="sending"
-        placeholder="Posez votre question..."
+        placeholder="Posez votre question sur EduVia..."
       />
-      <button type="button" (click)="sendMessage()" [disabled]="sending">
-        {{ sending ? '…' : '➤' }}
+      <button type="button" (click)="sendMessage()" [class.is-busy]="pendingResponses > 0">
+        Envoyer
       </button>
     </div>
   </div>
