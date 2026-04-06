@@ -98,10 +98,15 @@ export class StudentLevelOnboarding implements OnChanges, OnDestroy {
   accessibilityMessage = '';
   keyPressCount = 0;
   autoAdvanceCountdown = 0;
+  resultChoiceCount = 0;
+  resultChoiceCountdown = 0;
+  awaitingResultReaderChoice = false;
 
   private keyboardSelectionTimer: ReturnType<typeof setTimeout> | null = null;
   private answerAdvanceTimer: ReturnType<typeof setTimeout> | null = null;
   private answerAdvanceInterval: ReturnType<typeof setInterval> | null = null;
+  private resultChoiceTimer: ReturnType<typeof setTimeout> | null = null;
+  private resultChoiceInterval: ReturnType<typeof setInterval> | null = null;
   private readonly keyboardValidationDelay = 8000;
 
   constructor(private http: HttpClient) {}
@@ -266,6 +271,7 @@ export class StudentLevelOnboarding implements OnChanges, OnDestroy {
     this.mode = 'result';
     this.resultSaved.emit(localResult);
     this.submitting = false;
+    this.announceResultIfNeeded();
 
     this.http
       .post<LevelAssessmentResult>('/api/student/level-assessment/submit', {
@@ -360,11 +366,22 @@ export class StudentLevelOnboarding implements OnChanges, OnDestroy {
 
   @HostListener('window:keydown', ['$event'])
   handleKeyboardAnswer(event: KeyboardEvent) {
-    if (!this.accessibilityMode || this.mode !== 'quiz' || this.loadingQuestions || !this.currentQuestion) {
+    if (!this.accessibilityMode) {
       return;
     }
 
     if (event.repeat || this.isIgnoredKey(event)) {
+      return;
+    }
+
+    if (this.mode === 'result' && this.awaitingResultReaderChoice) {
+      event.preventDefault();
+      event.stopPropagation();
+      this.handleResultChoiceKeyPress();
+      return;
+    }
+
+    if (this.mode !== 'quiz' || this.loadingQuestions || !this.currentQuestion) {
       return;
     }
 
@@ -586,8 +603,21 @@ export class StudentLevelOnboarding implements OnChanges, OnDestroy {
       this.answerAdvanceInterval = null;
     }
 
+    if (this.resultChoiceTimer) {
+      clearTimeout(this.resultChoiceTimer);
+      this.resultChoiceTimer = null;
+    }
+
+    if (this.resultChoiceInterval) {
+      clearInterval(this.resultChoiceInterval);
+      this.resultChoiceInterval = null;
+    }
+
     this.keyPressCount = 0;
     this.autoAdvanceCountdown = 0;
+    this.resultChoiceCount = 0;
+    this.resultChoiceCountdown = 0;
+    this.awaitingResultReaderChoice = false;
   }
 
   private scheduleAnswerAdvance(message: string) {
@@ -647,7 +677,14 @@ export class StudentLevelOnboarding implements OnChanges, OnDestroy {
   }
 
   private speakText(text: string) {
+    this.speakTextWithCallback(text);
+  }
+
+  private speakTextWithCallback(text: string, onEnd?: () => void) {
     if (!this.speechSupported) {
+      if (onEnd) {
+        onEnd();
+      }
       return;
     }
 
@@ -656,6 +693,9 @@ export class StudentLevelOnboarding implements OnChanges, OnDestroy {
     utterance.lang = 'fr-FR';
     utterance.rate = 0.95;
     utterance.pitch = 1;
+    if (onEnd) {
+      utterance.onend = () => onEnd();
+    }
     window.speechSynthesis.speak(utterance);
   }
 
@@ -667,5 +707,108 @@ export class StudentLevelOnboarding implements OnChanges, OnDestroy {
 
   private isIgnoredKey(event: KeyboardEvent) {
     return ['Shift', 'Control', 'Alt', 'Meta', 'CapsLock', 'Tab'].includes(event.key);
+  }
+
+  private announceResultIfNeeded() {
+    if (!this.accessibilityMode || !this.activeResult) {
+      return;
+    }
+
+    this.clearResultChoiceOnly();
+    const result = this.activeResult;
+    const resultSpeech = [
+      `Resultat du test de niveau pret.`,
+      `Votre niveau EduVia est ${result.levelLabel}.`,
+      `Votre score est de ${result.score} sur ${result.totalQuestions}, soit ${result.percentage} pour cent.`,
+      `Recommandation principale: ${result.recommendation}`,
+    ].join(' ');
+
+    this.accessibilityMessage =
+      "Lecture du resultat en cours. EduVia vous proposera ensuite de relire le resultat ou d'ouvrir le dashboard etudiant.";
+
+    this.speakTextWithCallback(resultSpeech, () => {
+      this.promptResultReaderChoice();
+    });
+  }
+
+  private promptResultReaderChoice() {
+    if (!this.accessibilityMode) {
+      return;
+    }
+
+    this.awaitingResultReaderChoice = true;
+    this.resultChoiceCount = 0;
+    this.resultChoiceCountdown = 0;
+    this.accessibilityMessage =
+      'Si vous voulez relire le resultat, appuyez une fois sur une touche. Pour ouvrir le dashboard etudiant, appuyez deux fois.';
+
+    this.speakText(
+      "Si vous voulez relire le resultat, appuyez une fois sur une touche. Pour ouvrir directement le dashboard etudiant, appuyez deux fois.",
+    );
+  }
+
+  private handleResultChoiceKeyPress() {
+    this.resultChoiceCount += 1;
+
+    if (this.resultChoiceCount > 2) {
+      this.accessibilityMessage =
+        'Maximum 2 pressions pour cette decision. Recommencez: une fois pour relire, deux fois pour ouvrir le dashboard.';
+      this.resultChoiceCount = 0;
+      this.clearResultChoiceOnly();
+      this.awaitingResultReaderChoice = true;
+      this.promptResultReaderChoice();
+      return;
+    }
+
+    this.accessibilityMessage =
+      `${this.resultChoiceCount} pression(s) detectee(s). Validation de votre choix dans 8 secondes.`;
+    this.scheduleResultChoiceResolution();
+  }
+
+  private scheduleResultChoiceResolution() {
+    this.clearResultChoiceOnly();
+    this.awaitingResultReaderChoice = true;
+    this.resultChoiceCountdown = 8;
+    this.resultChoiceInterval = setInterval(() => {
+      if (this.resultChoiceCountdown > 0) {
+        this.resultChoiceCountdown -= 1;
+      }
+    }, 1000);
+    this.resultChoiceTimer = setTimeout(() => {
+      this.resolveResultReaderChoice();
+    }, this.keyboardValidationDelay);
+  }
+
+  private resolveResultReaderChoice() {
+    const choice = this.resultChoiceCount;
+    this.clearResultChoiceOnly();
+    this.awaitingResultReaderChoice = false;
+
+    if (choice === 1) {
+      this.resultChoiceCount = 0;
+      this.announceResultIfNeeded();
+      return;
+    }
+
+    this.accessibilityMessage =
+      'Ouverture automatique du dashboard etudiant.';
+    this.speakTextWithCallback(
+      'Ouverture automatique du dashboard etudiant.',
+      () => this.continueAfterResult(),
+    );
+  }
+
+  private clearResultChoiceOnly() {
+    if (this.resultChoiceTimer) {
+      clearTimeout(this.resultChoiceTimer);
+      this.resultChoiceTimer = null;
+    }
+
+    if (this.resultChoiceInterval) {
+      clearInterval(this.resultChoiceInterval);
+      this.resultChoiceInterval = null;
+    }
+
+    this.resultChoiceCountdown = 0;
   }
 }

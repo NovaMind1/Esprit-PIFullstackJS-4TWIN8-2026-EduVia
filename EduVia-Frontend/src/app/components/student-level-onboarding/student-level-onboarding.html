@@ -249,6 +249,29 @@
     <p class="result-recommendation">{{ result.recommendation }}</p>
     <p class="embedded-message" *ngIf="syncMessage">{{ syncMessage }}</p>
 
+    <div class="accessibility-guide" *ngIf="accessibilityMode">
+      <div class="accessibility-guide__row">
+        <span class="subject-pill">Lecteur vocal actif</span>
+        <span>{{ resultChoiceCount }} pression(s) detectee(s)</span>
+      </div>
+      <p>
+        EduVia lit le niveau obtenu, le score et la recommandation principale. Ensuite:
+        1 pression pour relire le resultat, 2 pressions pour ouvrir automatiquement le dashboard
+        etudiant.
+      </p>
+      <p class="accessibility-guide__status" *ngIf="accessibilityMessage">
+        {{ accessibilityMessage }}
+      </p>
+      <div class="accessibility-countdown" *ngIf="resultChoiceCountdown > 0">
+        <strong>Validation du choix</strong>
+        <span>
+          Action executee dans {{ resultChoiceCountdown }} seconde{{
+            resultChoiceCountdown > 1 ? 's' : ''
+          }}.
+        </span>
+      </div>
+    </div>
+
     <div class="result-grid">
       <div class="result-panel">
         <h3>Matieres fortes</h3>
