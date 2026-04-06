@@ -146,6 +146,14 @@
       <p class="accessibility-guide__status" *ngIf="accessibilityMessage">
         {{ accessibilityMessage }}
       </p>
+      <div class="accessibility-countdown" *ngIf="autoAdvanceCountdown > 0">
+        <strong>Passage automatique</strong>
+        <span>
+          Question suivante dans {{ autoAdvanceCountdown }} seconde{{
+            autoAdvanceCountdown > 1 ? 's' : ''
+          }}.
+        </span>
+      </div>
       <p class="form-error" *ngIf="!speechSupported">
         Le navigateur ne fournit pas la lecture vocale automatique. Le choix clavier reste
         disponible, mais le lecteur vocal doit etre teste sur un navigateur compatible.
@@ -189,12 +197,13 @@
         class="secondary-action"
         [disabled]="currentQuestionIndex === 0"
         (click)="goToPreviousQuestion()"
+        *ngIf="!accessibilityMode"
       >
         Precedent
       </button>
 
       <button
-        *ngIf="currentQuestionIndex < questions.length - 1"
+        *ngIf="currentQuestionIndex < questions.length - 1 && !accessibilityMode"
         type="button"
         class="primary-action"
         (click)="goToNextQuestion()"
@@ -203,7 +212,7 @@
       </button>
 
       <button
-        *ngIf="currentQuestionIndex === questions.length - 1"
+        *ngIf="currentQuestionIndex === questions.length - 1 && !accessibilityMode"
         type="button"
         class="primary-action"
         [disabled]="submitting"
@@ -211,6 +220,10 @@
       >
         {{ submitting ? 'Analyse du niveau...' : 'Valider le quiz de niveau' }}
       </button>
+
+      <div class="embedded-message accessibility-auto-navigation" *ngIf="accessibilityMode">
+        Navigation automatique active. EduVia passe seul a la question suivante apres validation.
+      </div>
     </div>
   </div>
 

@@ -97,9 +97,11 @@ export class StudentLevelOnboarding implements OnChanges, OnDestroy {
   accessibilityMode = false;
   accessibilityMessage = '';
   keyPressCount = 0;
+  autoAdvanceCountdown = 0;
 
   private keyboardSelectionTimer: ReturnType<typeof setTimeout> | null = null;
   private answerAdvanceTimer: ReturnType<typeof setTimeout> | null = null;
+  private answerAdvanceInterval: ReturnType<typeof setInterval> | null = null;
   private readonly keyboardValidationDelay = 8000;
 
   constructor(private http: HttpClient) {}
@@ -213,6 +215,10 @@ export class StudentLevelOnboarding implements OnChanges, OnDestroy {
   }
 
   goToPreviousQuestion() {
+    if (this.accessibilityMode) {
+      return;
+    }
+
     if (this.currentQuestionIndex > 0) {
       this.currentQuestionIndex -= 1;
       this.errorMessage = '';
@@ -222,6 +228,10 @@ export class StudentLevelOnboarding implements OnChanges, OnDestroy {
   }
 
   goToNextQuestion() {
+    if (this.accessibilityMode) {
+      return;
+    }
+
     if (!this.currentAnswer) {
       this.errorMessage = 'Choisis une reponse pour continuer.';
       return;
@@ -571,7 +581,13 @@ export class StudentLevelOnboarding implements OnChanges, OnDestroy {
       this.answerAdvanceTimer = null;
     }
 
+    if (this.answerAdvanceInterval) {
+      clearInterval(this.answerAdvanceInterval);
+      this.answerAdvanceInterval = null;
+    }
+
     this.keyPressCount = 0;
+    this.autoAdvanceCountdown = 0;
   }
 
   private scheduleAnswerAdvance(message: string) {
@@ -579,11 +595,18 @@ export class StudentLevelOnboarding implements OnChanges, OnDestroy {
       return;
     }
 
+    this.clearAnswerAdvanceOnly();
     if (this.answerAdvanceTimer) {
       clearTimeout(this.answerAdvanceTimer);
     }
 
     this.accessibilityMessage = message;
+    this.autoAdvanceCountdown = 8;
+    this.answerAdvanceInterval = setInterval(() => {
+      if (this.autoAdvanceCountdown > 0) {
+        this.autoAdvanceCountdown -= 1;
+      }
+    }, 1000);
     this.answerAdvanceTimer = setTimeout(() => {
       this.moveToNextQuestionAfterAccessibilitySelection();
     }, this.keyboardValidationDelay);
@@ -594,6 +617,7 @@ export class StudentLevelOnboarding implements OnChanges, OnDestroy {
       return;
     }
 
+    this.clearAnswerAdvanceOnly();
     this.answerAdvanceTimer = null;
     this.stopSpeech();
 
@@ -606,6 +630,20 @@ export class StudentLevelOnboarding implements OnChanges, OnDestroy {
     this.accessibilityMessage = 'Reponse validee. Question suivante.';
     this.currentQuestionIndex += 1;
     this.readCurrentQuestionIfNeeded();
+  }
+
+  private clearAnswerAdvanceOnly() {
+    if (this.answerAdvanceTimer) {
+      clearTimeout(this.answerAdvanceTimer);
+      this.answerAdvanceTimer = null;
+    }
+
+    if (this.answerAdvanceInterval) {
+      clearInterval(this.answerAdvanceInterval);
+      this.answerAdvanceInterval = null;
+    }
+
+    this.autoAdvanceCountdown = 0;
   }
 
   private speakText(text: string) {

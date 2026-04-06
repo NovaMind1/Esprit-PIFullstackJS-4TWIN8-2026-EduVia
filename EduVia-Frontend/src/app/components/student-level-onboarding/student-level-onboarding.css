@@ -304,6 +304,23 @@
   font-weight: 700;
 }
 
+.accessibility-countdown {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(236, 72, 153, 0.08);
+  color: #9d174d;
+  font-weight: 700;
+}
+
+.accessibility-auto-navigation {
+  width: 100%;
+  text-align: center;
+}
+
 .quiz-heading__icon {
   flex: 0 0 54px;
   width: 54px;
@@ -527,7 +544,8 @@
   }
 
   .accessibility-panel,
-  .accessibility-guide__row {
+  .accessibility-guide__row,
+  .accessibility-countdown {
     grid-template-columns: 1fr;
     display: grid;
   }
