@@ -1,7 +1,15 @@
 <div class="app-container">
   @if (!isLoggedIn()) {
     <app-login [role]="'student'" (login)="onLogin($event)" />
+  } @else if (!isDashboardReady()) {
+    <app-student-level-onboarding
+      [studentEmail]="studentEmail()"
+      [existingResult]="assessmentResult()"
+      (resultSaved)="onAssessmentSaved($event)"
+      (continueToDashboard)="openStudentDashboard()"
+      (logout)="onLogout()"
+    />
   } @else {
-    <app-student-dashboard (logout)="onLogout()" />
+    <app-student-dashboard [studentLevel]="studentLevel()" (logout)="onLogout()" />
   }
 </div>

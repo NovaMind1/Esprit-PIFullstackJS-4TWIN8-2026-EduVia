@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.angular/
+.cache/
+
+.env
+.env.*
+
+*.log
+*.err.log
+
+uploads/
+tmp/
+*.tmp
+level-assessment-test.json

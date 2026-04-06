@@ -1,0 +1,222 @@
+﻿<section class="level-shell">
+  <div class="level-card" *ngIf="mode === 'welcome'">
+    <div class="welcome-side">
+      <div class="welcome-badge">EduVia smart start</div>
+      <img src="logo.png" alt="EduVia" class="welcome-logo" />
+      <h1>Bienvenue sur EduVia</h1>
+      <p class="welcome-copy">
+        Bonjour {{ studentFirstName }}. Avant d'ouvrir votre espace etudiant, nous allons
+        mesurer votre niveau sur les matieres cles afin d'adapter vos cours, vos quiz et vos
+        recommandations.
+      </p>
+
+      <div class="welcome-highlights">
+        <div class="highlight-card">
+          <strong>18 matieres</strong>
+          <span>algo, reseaux, complexite, angular, react, C, Java, Python, etc.</span>
+        </div>
+        <div class="highlight-card">
+          <strong>Resultat intelligent</strong>
+          <span>niveau debutant, intermediaire ou avance selon vos reponses.</span>
+        </div>
+        <div class="highlight-card">
+          <strong>Dashboard adapte</strong>
+          <span>le parcours visible se calibre automatiquement a votre niveau.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="welcome-panel">
+      <div class="panel-header">
+        <span class="panel-kicker">Check your level</span>
+        <h2>Evaluation intelligente de votre niveau</h2>
+        <p>
+          En 18 questions, EduVia construit votre point de depart pour personnaliser votre
+          apprentissage.
+        </p>
+      </div>
+
+      <div class="existing-result" *ngIf="existingResult as saved">
+        <div class="existing-result__head">
+          <span class="level-pill" [class]="'level-pill--' + resultTone(saved.level)">
+            {{ saved.levelLabel }}
+          </span>
+          <span class="existing-result__score">{{ saved.score }}/{{ saved.totalQuestions }}</span>
+        </div>
+        <p class="existing-result__summary">{{ saved.summary }}</p>
+        <span class="existing-result__date">
+          Dernier test realise le {{ formatDate(saved.completedAt) }}
+        </span>
+      </div>
+
+      <div class="welcome-actions">
+        <button type="button" class="primary-action" (click)="startAssessment()">
+          {{ existingResult ? 'Refaire mon test de niveau' : 'Check your level' }}
+        </button>
+        <button
+          *ngIf="existingResult"
+          type="button"
+          class="secondary-action"
+          (click)="continueWithExistingLevel()"
+        >
+          Continuer avec mon niveau actuel
+        </button>
+        <button type="button" class="text-action" (click)="logout.emit()">Retour au login</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="level-card level-card--quiz" *ngIf="mode === 'quiz'">
+    <div class="quiz-topbar">
+      <span class="progress-chip">
+        Question {{ currentQuestionIndex + 1 }} sur {{ questions.length || 0 }}
+      </span>
+      <strong>{{ progressPercentage }}%</strong>
+    </div>
+
+    <div class="progress-track">
+      <span class="progress-track__value" [style.width.%]="progressPercentage"></span>
+    </div>
+
+    <div class="quiz-heading">
+      <div class="quiz-heading__icon">
+        <mat-icon class="quiz-heading__icon-symbol">psychology</mat-icon>
+      </div>
+      <div>
+        <h2>Evaluation intelligente de votre niveau</h2>
+        <p>Repondez a chaque question pour que l'IA adapte le contenu a vos besoins.</p>
+      </div>
+    </div>
+
+    <div class="embedded-message" *ngIf="loadingQuestions">
+      Chargement des questions de positionnement...
+    </div>
+
+    <ng-container *ngIf="!loadingQuestions && currentQuestion as question">
+      <div class="question-card">
+        <div class="question-card__meta">
+          <span class="subject-pill">{{ question.subject }}</span>
+          <span>{{ answeredCount }}/{{ questions.length }} reponses completes</span>
+        </div>
+
+        <h3>{{ question.prompt }}</h3>
+        <p class="question-hint">{{ question.hint }}</p>
+
+        <div class="answer-list">
+          <button
+            *ngFor="let option of question.options"
+            type="button"
+            class="answer-option"
+            [class.answer-option--active]="currentAnswer === option.id"
+            (click)="selectOption(option.id)"
+          >
+            <span class="answer-option__marker"></span>
+            <span>{{ option.label }}</span>
+          </button>
+        </div>
+      </div>
+    </ng-container>
+
+    <p *ngIf="errorMessage" class="form-error">{{ errorMessage }}</p>
+
+    <div class="quiz-actions" *ngIf="!loadingQuestions">
+      <button
+        type="button"
+        class="secondary-action"
+        [disabled]="currentQuestionIndex === 0"
+        (click)="goToPreviousQuestion()"
+      >
+        Precedent
+      </button>
+
+      <button
+        *ngIf="currentQuestionIndex < questions.length - 1"
+        type="button"
+        class="primary-action"
+        (click)="goToNextQuestion()"
+      >
+        Suivant
+      </button>
+
+      <button
+        *ngIf="currentQuestionIndex === questions.length - 1"
+        type="button"
+        class="primary-action"
+        [disabled]="submitting"
+        (click)="submitAssessment()"
+      >
+        {{ submitting ? 'Analyse du niveau...' : 'Valider le quiz de niveau' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="level-card level-card--result" *ngIf="mode === 'result' && activeResult as result">
+    <div class="result-header">
+      <span class="panel-kicker">Resultat du test de niveau</span>
+      <h2>Votre niveau EduVia est pret</h2>
+      <p>
+        Nous avons analyse vos reponses sur les matieres fondamentales et construit un point de
+        depart personnalise.
+      </p>
+    </div>
+
+    <div class="result-hero" [class]="'result-hero--' + resultTone(result.level)">
+      <div class="result-hero__score">{{ result.score }}/{{ result.totalQuestions }}</div>
+      <div>
+        <strong>{{ result.levelLabel }}</strong>
+        <p>{{ result.percentage }}% de bonnes reponses</p>
+      </div>
+    </div>
+
+    <p class="result-summary">{{ result.summary }}</p>
+    <p class="result-recommendation">{{ result.recommendation }}</p>
+
+    <div class="result-grid">
+      <div class="result-panel">
+        <h3>Matieres fortes</h3>
+        <div class="chip-list">
+          <span class="skill-chip skill-chip--success" *ngFor="let item of result.strongestSubjects">
+            {{ item }}
+          </span>
+          <span class="empty-chip" *ngIf="result.strongestSubjects.length === 0">
+            Nous allons construire ces forces apres vos premiers cours.
+          </span>
+        </div>
+      </div>
+
+      <div class="result-panel">
+        <h3>Matieres a renforcer</h3>
+        <div class="chip-list">
+          <span class="skill-chip skill-chip--warning" *ngFor="let item of result.improvementSubjects">
+            {{ item }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="result-details">
+      <h3>Lecture rapide de vos reponses</h3>
+      <div class="subject-breakdown">
+        <article *ngFor="let item of result.subjectBreakdown" class="subject-row">
+          <div>
+            <strong>{{ item.subject }}</strong>
+            <p>{{ item.explanation }}</p>
+          </div>
+          <span class="subject-state" [class.subject-state--success]="item.correct">
+            {{ item.correct ? 'OK' : 'A revoir' }}
+          </span>
+        </article>
+      </div>
+    </div>
+
+    <div class="quiz-actions">
+      <button type="button" class="secondary-action" (click)="retakeAssessment()">
+        Refaire le test
+      </button>
+      <button type="button" class="primary-action" (click)="continueAfterResult()">
+        Acceder a mon espace etudiant
+      </button>
+    </div>
+  </div>
+</section>
+
